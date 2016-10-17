@@ -4,7 +4,7 @@
 #region License
 
 <#
-		Copyright (c) 2016, Quality Software Ltd.
+		Copyright (c) 2016, Alright-IT GmbH
 		All rights reserved.
 
 		Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,17 @@
 		THE POSSIBILITY OF SUCH DAMAGE.
 
 		By using the Software, you agree to the License, Terms and Conditions above!
+#>
+
+<#
+		This is a third party Software!
+
+		The developer of this Software is NOT sponsored by or affiliated with
+		Microsoft Corp (MSFT) or any of it's subsidiaries in any way
+
+		The Software is not supported by Microsoft Corp (MSFT)!
+
+		More about Alright-IT GmbH http://www.alright-it.com
 #>
 
 #endregion License

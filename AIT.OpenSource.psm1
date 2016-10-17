@@ -12,13 +12,14 @@
 		Public Beta Version
 
 		.LINK
-		http://enatec.io
-		http://www.q-soft.co.uk
+		http://www.alright-it.com
+		https://github.com/Alright-IT/AIT.OpenSource
 
 		.LINK
 #>
 
 #region License
+
 <#
 		Copyright (c) 2016, Alright-IT GmbH
 		All rights reserved.
@@ -62,6 +63,7 @@
 
 		More about Alright-IT GmbH http://www.alright-it.com
 #>
+
 #endregion License
 
 #region ModuleDefaults
@@ -4485,13 +4487,13 @@ function Get-PendingReboot {
 				## Creating Custom PSObject and Select-Object Splat
 				$SelectSplat = @{
 					Property = (
-						'Computer', 
-						'CBServicing', 
-						'WindowsUpdate', 
-						'CCMClientSDK', 
-						'PendComputerRename', 
-						'PendFileRename', 
-						'PendFileRenVal', 
+						'Computer',
+						'CBServicing',
+						'WindowsUpdate',
+						'CCMClientSDK',
+						'PendComputerRename',
+						'PendFileRename',
+						'PendFileRenVal',
 						'RebootPending'
 					)
 				}
@@ -4946,46 +4948,46 @@ function Get-Quote {
 	BEGIN {
 		# The quote should include the author separated by " - ".
 		$texts = @(
-			'It was a mistake to think that GUIs ever would, could, or even should, eliminate CLIs. - Jeffrey Snover', 
-			"Leader who don't Listen will eventually be surrounded by people who have nothing to say. - @AndyStanley", 
-			'Good is the enemy of great. - Sir Jonathan Ive', 
+			'It was a mistake to think that GUIs ever would, could, or even should, eliminate CLIs. - Jeffrey Snover',
+			"Leader who don't Listen will eventually be surrounded by people who have nothing to say. - @AndyStanley",
+			'Good is the enemy of great. - Sir Jonathan Ive',
 			'There are 9 rejected ideas for every idea that works. - Sir Jonathan Ive'
-			"People's interest is in the product, not in its authorship. - Sir Jonathan Ive", 
-			"I think it's really important to design things with a kind of personality. - Marc Newson", 
-			'Intelligence is the ability to adapt to change. - Stephen Hawking', 
-			'We are all now connected by the Internet, like neurons in a giant brain. - Stephen Hawking', 
-			'The best ideas start as conversations. - Sir Jonathan Ive', 
-			'If something is not good enough, stop doing it. - Sir Jonathan Ive', 
-			"There's no learning without trying lots of ideas and failing lots of times. - Sir Jonathan Ive", 
-			'Any product that needs a manual to work is broken. - Elon Musk', 
-			'Business has only two functions: marketing and innovation. - Milan Kundera', 
-			"Just because something doesn't do what you planned it to do doesn't mean it's useless. - Thomas A. Edison", 
-			'Great companies are built on great products. - Elon Musk', 
-			'Test fast, fail fast, adjust fast. - Tom Peters', 
-			"Winning isn't everything, it's the only thing. - Vince Lombardi (Former NFL Coach)", 
-			'The only place success comes before work is in the dictionary. - Vince Lombardi (Former NFL Coach)', 
-			'The measure of who we are is what we do with what we have. - Vince Lombardi (Former NFL Coach)', 
+			"People's interest is in the product, not in its authorship. - Sir Jonathan Ive",
+			"I think it's really important to design things with a kind of personality. - Marc Newson",
+			'Intelligence is the ability to adapt to change. - Stephen Hawking',
+			'We are all now connected by the Internet, like neurons in a giant brain. - Stephen Hawking',
+			'The best ideas start as conversations. - Sir Jonathan Ive',
+			'If something is not good enough, stop doing it. - Sir Jonathan Ive',
+			"There's no learning without trying lots of ideas and failing lots of times. - Sir Jonathan Ive",
+			'Any product that needs a manual to work is broken. - Elon Musk',
+			'Business has only two functions: marketing and innovation. - Milan Kundera',
+			"Just because something doesn't do what you planned it to do doesn't mean it's useless. - Thomas A. Edison",
+			'Great companies are built on great products. - Elon Musk',
+			'Test fast, fail fast, adjust fast. - Tom Peters',
+			"Winning isn't everything, it's the only thing. - Vince Lombardi (Former NFL Coach)",
+			'The only place success comes before work is in the dictionary. - Vince Lombardi (Former NFL Coach)',
+			'The measure of who we are is what we do with what we have. - Vince Lombardi (Former NFL Coach)',
 			'The greatest accomplishment is not in never falling, but in rising again after you fall. - Vince Lombardi (Former NFL Coach)'
-			'Perfection is not attainable. But if we chase perfection, we can catch excellence. - Vince Lombardi (Former NFL Coach)', 
-			"Stay focused. Your start does not determine how you're going to finish. - Herm Edwards (Former NFL Coach)", 
-			'Nobody who ever gave his best regretted it. - George S. Halas (Former NFL Coach)', 
-			"Don't let the noise of others' opinions drown out your own inner voice. - Steve Jobs", 
-			'One way to remember who you are is to remember who your heroes are. - Walter Isaacson (Steve Jobs)', 
-			'Why join the navy if you can be a pirate? - Steve Jobs', 
-			'Innovation distinguishes between a leader and a follower. - Steve Jobs', 
-			"Sometimes life hits you in the head with a brick. Don't lose faith. - Steve Jobs", 
-			'Design is not just what it looks like and feels like. Design is how it works. - Steve Jobs', 
-			"We made the buttons on the screen look so good you'll want to lick them. - Steve Jobs", 
-			"Things don't have to change the world to be important. - Steve Jobs", 
-			'Your most unhappy customers are your greatest source of learning. - Bill Gates', 
-			'Software is a great combination between artistry and engineering. - Bill Gates', 
-			"Success is a lousy teacher. It seduces smart people into thinking they can't lose. - Bill Gates", 
-			"If you can't make it good, at least make it look good. - Bill Gates", 
-			"If you're not making mistakes, then you're not making decisions. - Catherine Cook (MeetMe Co-Founder)", 
-			"I have not failed. I've just found 10.000 ways that won't work. - Thomas Edison", 
-			"If you don't build your dream, someone will hire you to help build theirs. - Tony Gaskin (Motivational Speaker)", 
-			"Don't count the days, make the days count. - Muhammad Ali", 
-			'Everything you can imagine is real. - Pablo Picasso', 
+			'Perfection is not attainable. But if we chase perfection, we can catch excellence. - Vince Lombardi (Former NFL Coach)',
+			"Stay focused. Your start does not determine how you're going to finish. - Herm Edwards (Former NFL Coach)",
+			'Nobody who ever gave his best regretted it. - George S. Halas (Former NFL Coach)',
+			"Don't let the noise of others' opinions drown out your own inner voice. - Steve Jobs",
+			'One way to remember who you are is to remember who your heroes are. - Walter Isaacson (Steve Jobs)',
+			'Why join the navy if you can be a pirate? - Steve Jobs',
+			'Innovation distinguishes between a leader and a follower. - Steve Jobs',
+			"Sometimes life hits you in the head with a brick. Don't lose faith. - Steve Jobs",
+			'Design is not just what it looks like and feels like. Design is how it works. - Steve Jobs',
+			"We made the buttons on the screen look so good you'll want to lick them. - Steve Jobs",
+			"Things don't have to change the world to be important. - Steve Jobs",
+			'Your most unhappy customers are your greatest source of learning. - Bill Gates',
+			'Software is a great combination between artistry and engineering. - Bill Gates',
+			"Success is a lousy teacher. It seduces smart people into thinking they can't lose. - Bill Gates",
+			"If you can't make it good, at least make it look good. - Bill Gates",
+			"If you're not making mistakes, then you're not making decisions. - Catherine Cook (MeetMe Co-Founder)",
+			"I have not failed. I've just found 10.000 ways that won't work. - Thomas Edison",
+			"If you don't build your dream, someone will hire you to help build theirs. - Tony Gaskin (Motivational Speaker)",
+			"Don't count the days, make the days count. - Muhammad Ali",
+			'Everything you can imagine is real. - Pablo Picasso',
 			"In three words I can sum up everything I've learned about life: it goes on. - Robert Frost"
 		)
 
@@ -11437,8 +11439,8 @@ function Send-Packet {
 
 	PROCESS {
 		$packet = New-Object -TypeName System.Net.Sockets.Socket -ArgumentList (
-			[Net.Sockets.AddressFamily]::InterNetwork, 
-			[Net.Sockets.SocketType]::Raw, 
+			[Net.Sockets.AddressFamily]::InterNetwork,
+			[Net.Sockets.SocketType]::Raw,
 			[Net.Sockets.ProtocolType]::$Protocol
 		)
 

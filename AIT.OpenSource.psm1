@@ -307,6 +307,7 @@ function ConvertFrom-BinHex {
 
 			.EXAMPLE
 			PS C:\> ConvertFrom-BinHex 0c
+			12
 
 			Description
 			-----------
@@ -361,6 +362,7 @@ function ConvertTo-BinHex {
 
 			.EXAMPLE
 			PS C:\> ConvertTo-BinHex 1234
+			4d2
 
 			Description
 			-----------
@@ -421,7 +423,7 @@ function Invoke-CheckSessionArch {
 
 			Description
 			-----------
-			It shows that the architecture is 64BIT and that the session also supports X64.
+			It shows that the architecture is 64 BIT and that the session also supports X64.
 
 			.LINK
 			https://github.com/Alright-IT/AIT.OpenSource
@@ -467,7 +469,7 @@ function Clear-AllEventLogs {
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'High',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	[OutputType([String])]
 	param ()
 
@@ -480,7 +482,7 @@ function Clear-AllEventLogs {
 	}
 
 	PROCESS {
-		if ($pscmdlet.ShouldProcess('Target', 'Operation')) {
+		if ($pscmdlet.ShouldProcess('All EventLogs', 'Delete e.g. Cleanup')) {
 			Get-EventLog -List | ForEach-Object -Process {
 				Write-Host -Object ('Clearing {0}' -f $_.Log)
 				Clear-EventLog -LogName $_.Log -Confirm:$False
@@ -666,86 +668,6 @@ function Clear-TempDir {
 	}
 }
 
-function Get-Clipboard {
-	<#
-			.SYNOPSIS
-			Get the actual content of the Clipboard
-
-			.DESCRIPTION
-			Get the actual content of the Clipboard
-
-			.NOTES
-			It works in PowerShell STA Mode only!
-
-			.EXAMPLE
-			PS C:\> $foo = (Get-Clipboard)
-
-			Description
-			-----------
-			Get the content of the Clipboard and set it to the variable 'foo'
-
-			.LINK
-			Set-Clipboard
-	#>
-
-	[CmdletBinding()]
-	param ()
-
-	PROCESS {
-		if ($Host.Runspace.ApartmentState -eq 'STA') {
-			Add-Type -AssemblyName PresentationCore
-			[Windows.Clipboard]::GetText()
-		} else {
-			Write-Warning -Message ('Run {0} with the -STA parameter to use this function' -f $Host.Name)
-		}
-	}
-}
-
-function Set-Clipboard {
-	<#
-			.SYNOPSIS
-			Copy content to the Clipboard
-
-			.DESCRIPTION
-			Copy content to the Clipboard
-
-			.PARAMETER Import
-			Content to import to the Clipboard
-
-			.EXAMPLE
-			PS C:\> Set-Clipboard -Import $foo
-
-			Description
-			-----------
-			It imports the content of the variable $foo to the Clipboard.
-
-			.NOTES
-			STA Mode only!
-
-			.LINK
-			Get-Clipboard
-	#>
-
-	param
-	(
-		[Parameter(Mandatory,
-				ValueFromPipeline,
-				Position = 0,
-		HelpMessage = 'Content to import')]
-		[ValidateNotNullOrEmpty()]
-		[String]$Import
-	)
-
-	PROCESS {
-		if ($Host.Runspace.ApartmentState -eq 'STA') {
-			Add-Type -AssemblyName PresentationCore
-			[Windows.Clipboard]::SetText($Import)
-		} else {
-			Write-Warning -Message ('Run {0} with the -STA parameter to use this function' -f $Host.Name)
-		}
-	}
-}
-
 function Save-CommandHistory {
 	<#
 			.SYNOPSIS
@@ -775,13 +697,13 @@ function Save-CommandHistory {
 
 	PROCESS {
 		# Where to store the XML History Dump
-		Set-Variable -Name 'CommandHistoryDump' -Value $((Join-Path -Path (Split-Path -Path $profile.CurrentUserAllHosts) -ChildPath 'commandHistory.xml') -as ([String] -as [type]))
+		[String]$CommandHistoryDump = "$env:USERPROFILE\commandHistory.xml"
 
 		# Be verbose
 		Write-Verbose -Message ('Save History to {0}' -f ($CommandHistoryDump))
 
 		# Dump the History
-		Get-History | Export-Clixml -Path $CommandHistoryDump -Force -Confirm:$False -Encoding utf8
+		(Get-History | Export-Clixml -Path $CommandHistoryDump -Force -Confirm:$False -Encoding utf8)
 	}
 }
 
@@ -813,7 +735,7 @@ function Import-CommandHistory {
 
 	PROCESS {
 		# Where-Object to Find the XML History Dump
-		Set-Variable -Name 'CommandHistoryDump' -Value $((Join-Path -Path (Split-Path -Path $profile.CurrentUserAllHosts) -ChildPath 'commandHistory.xml') -as ([String] -as [type]))
+		[String]$CommandHistoryDump = "$env:USERPROFILE\commandHistory.xml"
 
 		# Be verbose
 		Write-Verbose -Message 'Clear History to keep things clean'
@@ -990,96 +912,89 @@ function ConvertFrom-CurlRequest {
 	)
 
 	BEGIN {
-		# Load the Helper Functions
-		function Update-CurlRequestBody {
+		<#
+				Sub-Functions
+		#>
+
+		function Update-CurlStringBody {
 			<#
 					.SYNOPSIS
-					Helper for ConvertFrom-CurlRequest to transform the Body
+					Sub-Function to update the current cURL body
 
 					.DESCRIPTION
-					Helper for ConvertFrom-CurlRequest to transform the Body
+					Sub-Function to update the current cURL body
 
 					.PARAMETER body
-					The CURL Body
+					cURL body
 
 					.PARAMETER data
-					The CURL Data
+					cURL body data
 
 					.NOTES
-					Internal Helper
+					Sub-Function
+
+					.LINK
+					Update-CurlStringHeader
+					ConvertFrom-CurlRequest
 			#>
 
-			[CmdletBinding(SupportsShouldProcess = $True)]
+			[CmdletBinding()]
 			param
 			(
-				[Parameter(Mandatory,HelpMessage = 'Add help message for user')]$body,
-				[Parameter(Mandatory,HelpMessage = 'Add help message for user')][String]$data
+				$body,
+				[string]$data
 			)
 
-			BEGIN {
-				# Load the Assembly
-				Add-Type -AssemblyName System.Web
-
-				# Do we have a body Object?
-				if (-not ($body)) {
-					# Nope! Create one... Prevents a null pointer!
-					$body = @()
-				}
+			if (!$body) {
+				$body = @()
 			}
 
-			PROCESS {
-				# Convert
-				$body = @($body) + [Web.HttpUtility]::UrlEncode($data)
-			}
+			$body = @($body) + $data
 
-			END {
-				# Dump
-				return $body
-			}
+			return $body
 		}
 
-		function Update-CurlRequestHeaders {
+		function Update-CurlStringHeader {
 			<#
 					.SYNOPSIS
-					Helper for ConvertFrom-CurlRequest to transform the Headers
+					Sub-Function to update the current cURL header
 
 					.DESCRIPTION
-					Helper for ConvertFrom-CurlRequest to transform the Headers
+					Sub-Function to update the current cURL header
 
 					.PARAMETER headers
-					The CURL Header
+					current cURL header
 
 					.PARAMETER data
-					The CURL Data
+					current cURL header data
 
 					.NOTES
-					Internal Helper
+					Sub-Function
+
+					.LINK
+					Update-CurlStringBody
+					ConvertFrom-CurlRequest
 			#>
 
-			[CmdletBinding(SupportsShouldProcess = $True)]
+			[CmdletBinding()]
 			param
 			(
-				[Parameter(Mandatory,HelpMessage = 'Add help message for user')]$headers,
-				[Parameter(Mandatory,HelpMessage = 'Add help message for user')][String]$data
+				$headers,
+				[string]$data
 			)
 
 			BEGIN {
-				# Do we have a header Object?
 				if (-not ($headers)) {
-					# Nope! Create one... Prevents a null pointer!
 					$headers = @{ }
 				}
 			}
 
 			PROCESS {
-				# Split the input
-				$dataArray = ($data.Split(':'))
-				# Transform
+				$dataArray = $data.Split(':')
 				$headers.Add($dataArray[0].Trim(), $dataArray[1].Trim())
 			}
 
 			END {
-				# Dump
 				return $headers
 			}
 		}
@@ -1094,49 +1009,30 @@ function ConvertFrom-CurlRequest {
 
 		while ($index -lt ($tokens.Count)) {
 			switch ($tokens[$index]) {
-				# Remove the Curl command itself
 				'curl' { }
 				{ $_ -like '*://*' } {
 					$ParamList['Uri'] = $tokens[$index]
 				}
-
-				# Convert the data parameter
 				{ $_ -eq '-D' -or $_ -eq '--data' } {
 					$index++
-					$ParamList['Body'] = (Update-CurlRequestBody -body $ParamList['Body'] -data $tokens[$index])
-					if (-not ($ParamList['Method'])) {
-						$ParamList['Method'] = 'Post'
-					}
+					$ParamList['Body'] = Update-CurlStringBody -body $ParamList['Body'] -data $tokens[$index]
+					if (!$ParamList['Method']) { $ParamList['Method'] = 'Post' }
 				}
-
-				# Convert the header parameter
 				{ $_ -eq '-H' -or $_ -eq '--header' } {
 					$index++
-					$ParamList['Headers'] = (Update-CurlRequestHeaders -headers $ParamList['Headers'] -data $tokens[$index])
+					$ParamList['Headers'] = Update-CurlStringHeader -headers $ParamList['Headers'] -data $tokens[$index]
 				}
-
-				# Convert the agent parameter
 				{ $_ -eq '-A' -or $_ -eq '--user-agent' } {
 					$index++
-					if (-not ($ParamList['UserAgent'])) {
-						$ParamList['UserAgent'] = $tokens[$index]
-					}
+					if (!$ParamList['UserAgent']) { $ParamList['UserAgent'] = $tokens[$index] }
 				}
-
-				# Convert the request method
 				{ $_ -eq '-X' -or $_ -eq '--request ' } {
 					$index++
-					if (-not ($ParamList['Method'])) {
-						$ParamList['Method'] = $tokens[$index]
-					}
+					if (!$ParamList['Method']) { $ParamList['Method'] = $tokens[$index] }
 				}
-
-				# Convert the MaximumRedirection parameter, if present
 				{ $_ -eq '--max-redirs' } {
 					$index++
-					if (-not ($ParamList['MaximumRedirection'])) {
-						$ParamList['MaximumRedirection'] = $tokens[$index]
-					}
+					if (!$ParamList['MaximumRedirection']) { $ParamList['MaximumRedirection'] = $tokens[$index] }
 				}
 			}
 
@@ -1145,7 +1041,6 @@ function ConvertFrom-CurlRequest {
 	}
 
 	END {
-		# Dump the new Object
 		Write-Output -InputObject $ParamList -NoEnumerate
 	}
 }
@@ -1315,11 +1210,6 @@ function ConvertTo-HashTable {
 		[ValidateRange(1, 10)]
 		[int]$MaxDepth = 4
 	)
-
-	BEGIN {
-		# Be Verbose
-		Write-Verbose -Message ('Converting to hashtable {0}' -f $InputObject.GetType())
-	}
 
 	PROCESS {
 		$propNames = $InputObject.psobject.Properties | Select-Object -ExpandProperty Name
@@ -1593,26 +1483,30 @@ function ConvertTo-StringList {
 			.EXAMPLE
 			$Computers = "Computer1","Computer2"
 			ConvertTo-StringList -Array $Computers
+			Computer1,Computer2
 
 			Description
 			-----------
-			Computer1,Computer2
+			Convert an array into a string list with a default delimiter.
 
 			.EXAMPLE
 			$Computers = "Computer1","Computer2"
 			ConvertTo-StringList -Array $Computers -Delimiter "__"
+			Computer1__Computer2
 
 			Description
 			-----------
-			Computer1__Computer2
+			Convert an array into a string list with a given delimiter.
 
 			.EXAMPLE
 			$Computers = "Computer1"
 			ConvertTo-StringList -Array $Computers -Delimiter "__"
+			Computer1
 
 			Description
 			-----------
-			Computer1
+			Convert an array into a string list with a given delimiter.
+			In this case, just one item is given!
 
 			.NOTES
 			Based on an idea of Francois-Xavier Cat
@@ -1636,7 +1530,7 @@ function ConvertTo-StringList {
 	)
 
 	BEGIN {
-		Remove-Variable -Name 'StringList' -Force -Confirm:$False -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+		$StringList = $null
 	}
 
 	PROCESS {
@@ -1721,7 +1615,7 @@ function Disable-IEESEC {
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'Medium',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	param
 	(
 		[switch]$Users = ($False),
@@ -1748,7 +1642,7 @@ function Disable-IEESEC {
 			if ($Admins) {
 				$Key = 'HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}'
 				try {
-					Set-ItemProperty -Path $Key -Name 'IsInstalled' -Value 0 -Scope Script -Force -Confirm:$False -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+					Set-ItemProperty -Path $Key -Name 'IsInstalled' -Value 0 -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
 				} catch {
 					# Do nothing
 					Write-Verbose -Message 'Minor Exception catched!'
@@ -1759,7 +1653,7 @@ function Disable-IEESEC {
 			if ($Users) {
 				$Key = 'HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}'
 				try {
-					Set-ItemProperty -Path $Key -Name 'IsInstalled' -Value 0 -Scope Script -Force -Confirm:$False -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+					Set-ItemProperty -Path $Key -Name 'IsInstalled' -Value 0 -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
 				} catch {
 					# Do nothing
 					Write-Verbose -Message 'Minor Exception catched!'
@@ -1845,8 +1739,8 @@ function ConvertTo-EscapeString {
 			In this example we escape the space in the string "Hello World"
 
 			.EXAMPLE
-			PS C:\> "http://enatec.io" | ConvertTo-EscapeString
-			http%3A%2F%2Fenatec.io
+			PS C:\> "http://www.alright-it.com" | ConvertTo-EscapeString
+			http%3A%2F%2Fwww.alright-it.com
 
 			Description
 			-----------
@@ -1906,8 +1800,8 @@ function ConvertFrom-EscapedString {
 			In this example we un-escape the space in the string "Hello%20World"
 
 			.EXAMPLE
-			PS C:\> "http%3A%2F%2Fenatec.io" | ConvertFrom-EscapedString
-			http://enatec.io
+			PS C:\> "http%3A%2F%2Fwww.alright-it.com" | ConvertFrom-EscapedString
+			http://www.alright-it.com
 
 			Description
 			-----------
@@ -2064,7 +1958,11 @@ function Test-Filelock {
 			It tests if a given file is locked.
 
 			.EXAMPLE
-			PS C:\> Test-Filelock
+			PS C:\scripts\PowerShell> Test-Filelock .\profile.ps1
+
+			path          filelocked
+			----          ----------
+			.\profile.ps1      False
 
 			Description
 			-----------
@@ -2223,7 +2121,7 @@ function Set-FirewallExceptionRDP {
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'Medium',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	param ()
 
 	BEGIN {
@@ -2260,7 +2158,7 @@ function Set-FirewallExceptionFileSharing {
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'Medium',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	param ()
 
 	BEGIN {
@@ -2401,14 +2299,15 @@ function Get-ASCBanner {
 			Create an ASC II Banner for a given String
 
 			.EXAMPLE
-			PS C:\scripts\PowerShell> Get-ASCBanner -InputString 'enatec.io' -IsString -ASCChar '*'
+			PS C:\scripts\PowerShell> Get-ASCBanner -InputString 'Alright-IT' -IsString -ASCChar '*'
 
-			******  *    *    **     *****  ******   ****              *     ****
-			*       **   *   *  *      *    *       *    *             *    *    *
-			*****   * *  *  *    *     *    *****   *                  *    *    *
-			*       *  * *  ******     *    *       *        ***       *    *    *
-			*       *   **  *    *     *    *       *    *   ***       *    *    *
-			******  *    *  *    *     *    ******   ****    ***       *     ****
+			*                                                              ***   *******
+			* *    *       *****      *     ****   *    *   *****            *       *
+			*   *   *       *    *     *    *    *  *    *     *              *       *
+			*     *  *       *    *     *    *       ******     *    *****     *       *
+			*******  *       *****      *    *  ***  *    *     *              *       *
+			*     *  *       *   *      *    *    *  *    *     *              *       *
+			*     *  ******  *    *     *     ****   *    *     *             ***      *
 
 			Description
 			-----------
@@ -2593,7 +2492,7 @@ function Get-AvailibleDriveLetter {
 			Get an available Drive Letter (A Random selection of a free letter)
 
 			.EXAMPLE
-			PS C:\> Get-AvailibleDriveLetter -Random
+			PS C:\> Get-AvailibleDriveLetter
 			F:
 
 			Description
@@ -2637,14 +2536,14 @@ function Get-BingSearch {
 			String to search for on Bing
 
 			.EXAMPLE
-			PS C:\> Get-BingSearch -searchstring:"Joerg Hochwald"
+			PS C:\> Get-BingSearch -searchstring "Joerg Hochwald"
 
 			Description
 			-----------
 			Return the Bing Search Results for "Joerg Hochwald"
 
 			.EXAMPLE
-			PS C:\> Get-BingSearch -searchstring:"KreativSign GmbH"
+			PS C:\> Get-BingSearch -searchstring "KreativSign GmbH"
 
 			Description
 			-----------
@@ -2802,18 +2701,20 @@ function Get-DiskInfo {
 
 	PROCESS {
 		$wmio = (Get-WmiObject -Class win32_logicaldisk)
+
 		$Drives = ($wmio |
 			Where-Object -FilterScript { ($_.size) } |
 			Select-Object -Property Deviceid, @{
 				name       = 'Free Space'
 				Expression = { ($_.freespace/1gb) }
 		})
+
 		$DrivesString = (0..$($Drives.count - 1) | ForEach-Object -Process { " $(($Drives[$_]).Deviceid.Replace(':', ' Drive')) has $('{0:N2}' -f $(($Drives[$_]).'free space')) GB of free space.`r`n" })
 		$DrivesString = "`r`nLoading system disk free space information...`r`n" + $DrivesString
 	}
 
 	END {
-		Write-Output -InputObject $DrivesString
+		Write-Output -InputObject $DrivesString -NoEnumerate
 	}
 }
 
@@ -3065,27 +2966,23 @@ function Get-Hash {
 			It specifies the cryptographic hash function to use for computing the hash value to the contents of the specified file.
 
 			.EXAMPLE
-			PS C:\> Get-FileHash -File 'C:\scripts\PowerShell\PesterDocs.ps1'
-
-			069DF9587DB0A8D3BA6D8E840099A2D9
+			PS C:\> Get-Hash -File 'C:\scripts\PowerShell\profile.ps1'
+			30BB3458D34B1A0F10E52F9F39025925
 
 			Description
 			-----------
 			Dumps the MD5 hash for the given File
 
 			.EXAMPLE
-			PS C:\> Get-Hash -File 'C:\scripts\PowerShell\PesterDocs.ps1' -Hash SHA1
-
-			BC6B28A939CB3DBB82C9A7BDA5D80A191E8F06AE
+			PS C:\> Get-Hash -File 'C:\scripts\PowerShell\profile.ps1' -hash SHA1
+			36A09B3C5BCB35AE48719D31699E96F72721FFFE
 
 			Description
 			-----------
 			Dumps the SHA1 hash for the given File
 
 			.NOTES
-			Re-factored to make it more flexible
-			(cryptographic hash is now a parameter)
-			This is just a little helper function to make the shell more flexible
+			It is removed and replaced with a wrapper of the native PowerShell function!
 
 			.LINK
 			https://github.com/Alright-IT/AIT.OpenSource
@@ -3094,7 +2991,6 @@ function Get-Hash {
 			https://github.com/Alright-IT/AIT.OpenSource/issues
 	#>
 
-	[OutputType([bool])]
 	param
 	(
 		[Parameter(Mandatory,
@@ -3110,7 +3006,11 @@ function Get-Hash {
 	)
 
 	PROCESS {
-		if (Get-Command -Name Get-FileHash -ErrorAction SilentlyContinue) {Return (Get-FileHash -Algorithm $hash -Path $File).Hash} else {Return $False}
+		if (Get-Command -Name Get-FileHash -ErrorAction SilentlyContinue) {
+			Return (Get-FileHash -Algorithm $hash -Path $File).Hash
+		} else {
+			Return $False
+		}
 	}
 }
 
@@ -3288,13 +3188,13 @@ function Get-InstalledDotNetVersions {
 			.EXAMPLE
 			PS C:\> Get-InstalledDotNetVersions
 
-			Version                                                                         FullVersion
-			-------                                                                         -----------
-			2.0                                                                             2.0.50727.5420
-			3.0                                                                             3.0.30729.5420
-			3.5                                                                             3.5.30729.5420
-			4.0                                                                             4.0.0.0
-			4.5+                                                                            4.6.1
+			Version FullVersion
+			------- -----------
+			2.0     2.0.50727.5420
+			3.0     3.0.30729.5420
+			3.5     3.5.30729.5420
+			4.0     4.0.0.0
+			4.5+    4.6.1
 
 			Description
 			-----------
@@ -3601,6 +3501,18 @@ function Get-LocalIPAdresses {
 			Show all local IP Addresses
 
 			.EXAMPLE
+			PS C:\> Get-LocalIPAdresses
+
+			IPAddressToString  AddressFamily
+			-----------------  -------------
+			10.211.55.5         InterNetwork
+			::1               InterNetworkV6
+
+			Description
+			-----------
+			Show all local IP Addresses
+
+			.EXAMPLE
 			PS C:\> Get-LocalIPAdresses | Format-List
 
 			IPAddressToString : fe80::3db7:8507:3f9a:bb13%11
@@ -3684,6 +3596,8 @@ function Get-LocalListenPort {
 			.EXAMPLE
 			PS> Get-LocalListenPort
 
+			Description
+			-----------
 			This example will find all network ports in uses on the local
 			computer with associated processes and services
 
@@ -3840,6 +3754,7 @@ function Get-LocalListenPort {
 	}
 }
 
+# TODO: FIX ME!
 function Get-MicrosoftUpdateInfo {
 	<#
 			.SYNOPSIS
@@ -3959,9 +3874,9 @@ function Get-myPROCESS {
 			.EXAMPLE
 			PS C:\> Get-myProcess
 
-			Handles  NPM(K)    PM(K)      WS(K) VM(M)   CPU(s)     Id ProcessName
-			-------  ------    -----      ----- -----   ------     -- -----------
-			511      44        79252      93428   664   11,653   3932 powershell
+			Handles  NPM(K)    PM(K)      WS(K) VM(M)   CPU(s)     Id  SI ProcessName
+			-------  ------    -----      ----- -----   ------     --  -- -----------
+			666      51   124016     127952   773    10,55   1096   1 powershell
 
 			Description
 			-----------
@@ -3993,6 +3908,7 @@ function Get-myPROCESS {
 	}
 }
 
+# TODO: Check on the LENOVO
 function Get-NetFramework {
 	<#
 			.SYNOPSIS
@@ -4037,7 +3953,7 @@ function Get-NetFramework {
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'High',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	param
 	(
 		[String[]]$ComputerName = "$env:COMPUTERNAME",
@@ -4058,7 +3974,7 @@ function Get-NetFramework {
 
 			# Get the Net Framework Installed
 			$netFramework = (Get-ChildItem -Path 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse |
-				Get-ItemProperty -Name Version -EA 0 |
+				Get-ItemProperty -Name Version |
 				Where-Object { $_.PSChildName -match '^(?!S)\p{L}' } |
 			Select-Object -Property PSChildName, Version)
 
@@ -4074,6 +3990,7 @@ function Get-NetFramework {
 	}
 }
 
+# TODO: Check on the LENOVO
 function Get-NetStat {
 	<#
 			.SYNOPSIS
@@ -4268,18 +4185,18 @@ function Get-NewPassword {
 	)
 
 	PROCESS {
-		# Delare an array holding what I need.  Here is the format
-		# The first number is a the number of characters (Ie 26 for the alphabet)
-		# The Second Number is Where-Object it resides in the Ascii Character set
-		# So 26,97 will pick a random number representing a letter in Asciii
+		# Declare an array holding what I need.  Here is the format
+		# The first number is a the number of characters (e.g. 26 for the alphabet)
+		# The Second Number is Where-Object it resides in the ASCII Character set
+		# So 26,97 will pick a random number representing a letter in ASCII
 		# and add it to 97 to produce the ASCII Character
 		[int32[]]$ArrayofAscii = 26, 97, 26, 65, 10, 48, 15, 33
 
 		# Complexity can be from 1 - 4 with the results being
-		# 1 - Pure lowercase Ascii
-		# 2 - Mix Uppercase and Lowercase Ascii
-		# 3 - Ascii Upper/Lower with Numbers
-		# 4 - Ascii Upper/Lower with Numbers and Punctuation
+		# 1 - Pure lowercase ASCII
+		# 2 - Mix Uppercase and Lowercase ASCII
+		# 3 - ASCII Upper/Lower with Numbers
+		# 4 - ASCII Upper/Lower with Numbers and Punctuation
 		if ($Complexity -eq $null) { Set-Variable -Name 'Complexity' -Scope Script -Value $(3) }
 
 		# Password Length can be from 1 to as Crazy as you want
@@ -4295,7 +4212,7 @@ function Get-NewPassword {
 			# in the array to generate out random letters / numbers
 			Set-Variable -Name 'pickSet' -Scope Script -Value $((Get-Random -Maximum $Complexity) * 2)
 
-			# Pick an Ascii Character and add it to the Password
+			# Pick an ASCII Character and add it to the Password
 			# Here is the original line I was testing with
 			# [System.Char] (GET-RANDOM 26) +97 Which generates
 			# Random Lowercase ASCII Characters
@@ -4332,13 +4249,13 @@ function Get-Pause {
 			If this is not set, it uses a default text "Press any key..."
 
 			.EXAMPLE
-			PS C:\> pause
+			PS C:\> Get-Pause
 
 			Display a console message and wait for user to press any key.
 			It shows the default Text "Press any key..."
 
 			.EXAMPLE
-			PS C:\> pause "Please press any key"
+			PS C:\> Get-Pause "Please press any key"
 
 			Description
 			-----------
@@ -4346,7 +4263,7 @@ function Get-Pause {
 			It shows the Text "Please press any key"
 
 			.EXAMPLE
-			PS C:\> pause -PauseMessage "Please press any key"
+			PS C:\> Get-Pause -PauseMessage "Please press any key"
 
 			Description
 			-----------
@@ -4568,13 +4485,13 @@ function Get-PendingReboot {
 				## Creating Custom PSObject and Select-Object Splat
 				$SelectSplat = @{
 					Property = (
-						'Computer',
-						'CBServicing',
-						'WindowsUpdate',
-						'CCMClientSDK',
-						'PendComputerRename',
-						'PendFileRename',
-						'PendFileRenVal',
+						'Computer', 
+						'CBServicing', 
+						'WindowsUpdate', 
+						'CCMClientSDK', 
+						'PendComputerRename', 
+						'PendFileRename', 
+						'PendFileRenVal', 
 						'RebootPending'
 					)
 				}
@@ -4777,6 +4694,7 @@ function Get-PhoneticSpelling {
 	}
 }
 
+# TODO: Check in detail!!!
 function Get-PreReqModules {
 	<#
 			.SYNOPSIS
@@ -4839,7 +4757,7 @@ function Get-PreReqModules {
 			https://download.microsoft.com/download/2/0/5/2050B39B-4DA5-48E0-B768-583533B42C3B/SkypeOnlinePowershell.exe
 	#>
 
-	[CmdletBinding(SupportsShouldProcess = $True)]
+	[CmdletBinding(SupportsShouldProcess)]
 	param
 	(
 		[Parameter(ValueFromPipeline,
@@ -4943,10 +4861,10 @@ function Get-PreReqModules {
 function Get-ProxyInfo {
 	<#
 			.SYNOPSIS
-			Detect the proxy for a given url
+			Detect the proxy for a given URL
 
 			.DESCRIPTION
-			Detect the proxy for a given url
+			Detect the proxy for a given URL
 
 			.PARAMETER URL
 			URL to check, the default is http://www.google.com
@@ -5028,46 +4946,46 @@ function Get-Quote {
 	BEGIN {
 		# The quote should include the author separated by " - ".
 		$texts = @(
-			'It was a mistake to think that GUIs ever would, could, or even should, eliminate CLIs. - Jeffrey Snover',
-			"Leader who don't Listen will eventually be surrounded by people who have nothing to say. - @AndyStanley",
-			'Good is the enemy of great. - Sir Jonathan Ive',
+			'It was a mistake to think that GUIs ever would, could, or even should, eliminate CLIs. - Jeffrey Snover', 
+			"Leader who don't Listen will eventually be surrounded by people who have nothing to say. - @AndyStanley", 
+			'Good is the enemy of great. - Sir Jonathan Ive', 
 			'There are 9 rejected ideas for every idea that works. - Sir Jonathan Ive'
-			"People's interest is in the product, not in its authorship. - Sir Jonathan Ive",
-			"I think it's really important to design things with a kind of personality. - Marc Newson",
-			'Intelligence is the ability to adapt to change. - Stephen Hawking',
-			'We are all now connected by the Internet, like neurons in a giant brain. - Stephen Hawking',
-			'The best ideas start as conversations. - Sir Jonathan Ive',
-			'If something is not good enough, stop doing it. - Sir Jonathan Ive',
-			"There's no learning without trying lots of ideas and failing lots of times. - Sir Jonathan Ive",
-			'Any product that needs a manual to work is broken. - Elon Musk',
-			'Business has only two functions: marketing and innovation. - Milan Kundera',
-			"Just because something doesn't do what you planned it to do doesn't mean it's useless. - Thomas A. Edison",
-			'Great companies are built on great products. - Elon Musk',
-			'Test fast, fail fast, adjust fast. - Tom Peters',
-			"Winning isn't everything, it's the only thing. - Vince Lombardi (Former NFL Coach)",
-			'The only place success comes before work is in the dictionary. - Vince Lombardi (Former NFL Coach)',
-			'The measure of who we are is what we do with what we have. - Vince Lombardi (Former NFL Coach)',
+			"People's interest is in the product, not in its authorship. - Sir Jonathan Ive", 
+			"I think it's really important to design things with a kind of personality. - Marc Newson", 
+			'Intelligence is the ability to adapt to change. - Stephen Hawking', 
+			'We are all now connected by the Internet, like neurons in a giant brain. - Stephen Hawking', 
+			'The best ideas start as conversations. - Sir Jonathan Ive', 
+			'If something is not good enough, stop doing it. - Sir Jonathan Ive', 
+			"There's no learning without trying lots of ideas and failing lots of times. - Sir Jonathan Ive", 
+			'Any product that needs a manual to work is broken. - Elon Musk', 
+			'Business has only two functions: marketing and innovation. - Milan Kundera', 
+			"Just because something doesn't do what you planned it to do doesn't mean it's useless. - Thomas A. Edison", 
+			'Great companies are built on great products. - Elon Musk', 
+			'Test fast, fail fast, adjust fast. - Tom Peters', 
+			"Winning isn't everything, it's the only thing. - Vince Lombardi (Former NFL Coach)", 
+			'The only place success comes before work is in the dictionary. - Vince Lombardi (Former NFL Coach)', 
+			'The measure of who we are is what we do with what we have. - Vince Lombardi (Former NFL Coach)', 
 			'The greatest accomplishment is not in never falling, but in rising again after you fall. - Vince Lombardi (Former NFL Coach)'
-			'Perfection is not attainable. But if we chase perfection, we can catch excellence. - Vince Lombardi (Former NFL Coach)',
-			"Stay focused. Your start does not determine how you're going to finish. - Herm Edwards (Former NFL Coach)",
-			'Nobody who ever gave his best regretted it. - George S. Halas (Former NFL Coach)',
-			"Don't let the noise of others' opinions drown out your own inner voice. - Steve Jobs",
-			'One way to remember who you are is to remember who your heroes are. - Walter Isaacson (Steve Jobs)',
-			'Why join the navy if you can be a pirate? - Steve Jobs',
-			'Innovation distinguishes between a leader and a follower. - Steve Jobs',
-			"Sometimes life hits you in the head with a brick. Don't lose faith. - Steve Jobs",
-			'Design is not just what it looks like and feels like. Design is how it works. - Steve Jobs',
-			"We made the buttons on the screen look so good you'll want to lick them. - Steve Jobs",
-			"Things don't have to change the world to be important. - Steve Jobs",
-			'Your most unhappy customers are your greatest source of learning. - Bill Gates',
-			'Software is a great combination between artistry and engineering. - Bill Gates',
-			"Success is a lousy teacher. It seduces smart people into thinking they can't lose. - Bill Gates",
-			"If you can't make it good, at least make it look good. - Bill Gates",
-			"If you're not making mistakes, then you're not making decisions. - Catherine Cook (MeetMe Co-Founder)",
-			"I have not failed. I've just found 10.000 ways that won't work. - Thomas Edison",
-			"If you don't build your dream, someone will hire you to help build theirs. - Tony Gaskin (Motivational Speaker)",
-			"Don't count the days, make the days count. - Muhammad Ali",
-			'Everything you can imagine is real. - Pablo Picasso',
+			'Perfection is not attainable. But if we chase perfection, we can catch excellence. - Vince Lombardi (Former NFL Coach)', 
+			"Stay focused. Your start does not determine how you're going to finish. - Herm Edwards (Former NFL Coach)", 
+			'Nobody who ever gave his best regretted it. - George S. Halas (Former NFL Coach)', 
+			"Don't let the noise of others' opinions drown out your own inner voice. - Steve Jobs", 
+			'One way to remember who you are is to remember who your heroes are. - Walter Isaacson (Steve Jobs)', 
+			'Why join the navy if you can be a pirate? - Steve Jobs', 
+			'Innovation distinguishes between a leader and a follower. - Steve Jobs', 
+			"Sometimes life hits you in the head with a brick. Don't lose faith. - Steve Jobs", 
+			'Design is not just what it looks like and feels like. Design is how it works. - Steve Jobs', 
+			"We made the buttons on the screen look so good you'll want to lick them. - Steve Jobs", 
+			"Things don't have to change the world to be important. - Steve Jobs", 
+			'Your most unhappy customers are your greatest source of learning. - Bill Gates', 
+			'Software is a great combination between artistry and engineering. - Bill Gates', 
+			"Success is a lousy teacher. It seduces smart people into thinking they can't lose. - Bill Gates", 
+			"If you can't make it good, at least make it look good. - Bill Gates", 
+			"If you're not making mistakes, then you're not making decisions. - Catherine Cook (MeetMe Co-Founder)", 
+			"I have not failed. I've just found 10.000 ways that won't work. - Thomas Edison", 
+			"If you don't build your dream, someone will hire you to help build theirs. - Tony Gaskin (Motivational Speaker)", 
+			"Don't count the days, make the days count. - Muhammad Ali", 
+			'Everything you can imagine is real. - Pablo Picasso', 
 			"In three words I can sum up everything I've learned about life: it goes on. - Robert Frost"
 		)
 
@@ -5123,217 +5041,6 @@ function Get-Quote {
 		Remove-Variable -Name 'quote' -Force -Confirm:$False -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
 		Remove-Variable -Name 'author' -Force -Confirm:$False -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
 		Remove-Variable -Name 'arr' -Force -Confirm:$False -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-	}
-}
-
-function Get-RegKeyLastWriteTime {
-	<#
-			.SYNOPSIS
-			Retrieves the last write time of the supplied registry key
-
-			.DESCRIPTION
-			The Registry data that a hive stores in containers are called cells.
-			A cell can hold a key, a value, a security descriptor, a list of
-			subkeys, or a list of key values.
-			Get-RegKeyLastWriteTime retrieves the LastWriteTime through a pointer
-			to the FILETIME structure that receives the time at which the
-			enumerated subkey was last written. Values do not contain a
-			LastWriteTime property, but changes to child values update the
-			parent keys lpftLastWriteTime.
-
-			The LastWriteTime is updated when a key is created, modified,
-			accessed, or deleted.
-
-			.PARAMETER ComputerName
-			Computer name to query (Default is localhost)
-
-			.PARAMETER Key
-			Root Key to query, The default is HKLM
-			HKCR - Symbolic link to HKEY_LOCAL_MACHINE \SOFTWARE \Classes.
-			HKCU - Symbolic link to a key under HKEY_USERS representing a user's profile hive.
-			HKLM - Placeholder with no corresponding physical hive. This key contains
-			other keys that are hives.
-			HKU  - Placeholder that contains the user-profile hives of logged-on accounts.
-			HKCC - Symbolic link to the key of the current hardware profile
-
-			.PARAMETER SubKey
-			Registry Key to query
-
-			.PARAMETER NoEnumKey
-			A description of the NoEnumKey parameter.
-
-			.EXAMPLE
-			Get-RegKeyLastWriteTime -ComputerName 'testwks' -Key 'HKLM' -SubKey 'Software'
-
-			Description
-			-----------
-			Retrieves the last write time of the supplied registry key
-
-			.EXAMPLE
-			Get-RegKeyLastWriteTime -SubKey 'Software\Microsoft'
-
-			Description
-			-----------
-			Retrieves the last write time of the supplied registry key
-
-			.EXAMPLE
-			"testwks1","testwks2" | Get-RegKeyLastWriteTime -SubKey 'Software\Microsoft\Windows\CurrentVersion'
-
-			Description
-			-----------
-			Retrieves the last write time of the supplied registry key
-
-			.NOTES
-			LICENSE: Creative Commons Attribution 3.0 Unported License
-			(http://creativecommons.org/licenses/by/3.0/)
-
-			.LINK
-			http://www.shaunhess.com/journal/2011/7/4/reading-the-lastwritetime-of-a-registry-key-using-powershell.html
-	#>
-
-	param
-	(
-		[Parameter(ValueFromPipeline,
-				ValueFromPipelineByPropertyName,
-		Position = 0)]
-		[ValidateNotNullOrEmpty()]
-		[Alias('CN', '__SERVER', 'Computer', 'CNAME', 'IP')]
-		[String]$ComputerName = ($env:COMPUTERNAME),
-		[Parameter(ValueFromPipeline,
-		Position = 1)]
-		[String]$Key = 'HKLM',
-		[Parameter(Mandatory,ValueFromPipeline,
-				Position = 2,
-		HelpMessage = 'Registry Key to query')]
-		[String]$SubKey,
-		[Parameter(ValueFromPipeline,
-		Position = 3)]
-		[switch]$NoEnumKey
-	)
-
-	BEGIN {
-		switch ($Key) {
-			'HKCR' { $searchKey = 0x80000000 } #HK Classes Root
-			'HKCU' { $searchKey = 0x80000001 } #HK Current User
-			'HKLM' { $searchKey = 0x80000002 } #HK Local Machine
-			'HKU'  { $searchKey = 0x80000003 } #HK Users
-			'HKCC' { $searchKey = 0x80000005 } #HK Current Config
-			default {
-				'Invalid Key. Use one of the following options:
-				HKCR, HKCU, HKLM, HKU, HKCC'
-			}
-		}
-
-		#$KEYQUERYVALUE = 0x1
-		$KEYREAD = 0x19
-		#$KEYALLACCESS = 0x3F
-	}
-	PROCESS {
-		foreach ($Computer in $ComputerName) {
-			$sig0 = @'
-[DllImport("advapi32.dll", SetLastError = true)]
-public static extern int RegConnectRegistry(
-	string lpMachineName,
-	int hkey,
-	ref int phkResult);
-'@
-			$type0 = (Add-Type -MemberDefinition $sig0 -Name Win32Utils -Namespace RegConnectRegistry -UsingNamespace System.Text -PassThru)
-
-			Write-Verbose -Message ('{0}' -f $type0)
-
-			$sig1 = @'
-[DllImport("advapi32.dll", CharSet = CharSet.Auto)]
-public static extern int RegOpenKeyEx(
-	int hKey,
-	string subKey,
-	int ulOptions,
-	int samDesired,
-	out int hkResult);
-'@
-			$type1 = (Add-Type -MemberDefinition $sig1 -Name Win32Utils -Namespace RegOpenKeyEx -UsingNamespace System.Text -PassThru)
-
-			$sig2 = @'
-[DllImport("advapi32.dll", EntryPoint = "RegEnumKeyEx")]
-extern public static int RegEnumKeyEx(
-    int hkey,
-    int index,
-    StringBuilder lpName,
-    ref int lpcbName,
-    int reserved,
-    int lpClass,
-    int lpcbClass,
-    out long lpftLastWriteTime);
-'@
-			$type2 = (Add-Type -MemberDefinition $sig2 -Name Win32Utils -Namespace RegEnumKeyEx -UsingNamespace System.Text -PassThru)
-
-			$sig4 = @'
-[DllImport("advapi32.dll")]
-public static extern int RegQueryInfoKey(
-	int hkey,
-	StringBuilder lpClass,
-	ref int lpcbClass,
-	int lpReserved,
-	out int lpcSubKeys,
-	out int lpcbMaxSubKeyLen,
-	out int lpcbMaxClassLen,
-	out int lpcValues,
-	out int lpcbMaxValueNameLen,
-	out int lpcbMaxValueLen,
-	out int lpcbSecurityDescriptor,
-	out long lpftLastWriteTime);
-'@
-			$type4 = (Add-Type -MemberDefinition $sig4 -Name Win32Utils -Namespace RegQueryInfoKey -UsingNamespace System.Text -PassThru)
-
-			$sig3 = @'
-[DllImport("advapi32.dll", SetLastError=true)]
-public static extern int RegCloseKey(
-	int hKey);
-'@
-			$type3 = (Add-Type -MemberDefinition $sig3 -Name Win32Utils -Namespace RegCloseKey -UsingNamespace System.Text -PassThru)
-
-			$hKey = (New-Object -TypeName int)
-			$hKeyref = (New-Object -TypeName int)
-			#$searchKeyRemote = $type0::RegConnectRegistry($computer, $searchKey, [ref]$hKey)
-			$result = $type1::RegOpenKeyEx($hKey, $SubKey, 0, $KEYREAD, [ref]$hKeyref)
-
-			if ($NoEnumKey) {
-				#initialize variables
-				$time = (New-Object -TypeName Long)
-				$result = ($type4::RegQueryInfoKey($hKeyref, $null, [ref]$null, 0, [ref]$null, [ref]$null, [ref]$null, [ref]$null, [ref]$null, [ref]$null, [ref]$null, [ref]$time))
-
-				#create output object
-				$o = '' | Select-Object -Property Key, LastWriteTime, ComputerName
-				$o.ComputerName = "$Computer"
-				$o.Key = "$Key\$SubKey"
-
-				# TODO Change to use the time api
-				$o.LastWriteTime = (Get-Date -Date $time).AddYears(1600).AddHours(-4)
-				$o
-			} else {
-				#initialize variables
-				$builder = (New-Object -TypeName System.Text.StringBuilder -ArgumentList 1024)
-				$index = 0
-				$length = [int] 1024
-				$time = (New-Object -TypeName Long)
-
-				#234 means more info, 0 means success. Either way, keep reading
-				while (0, 234 -contains $type2::RegEnumKeyEx($hKeyref, $index++, $builder, [ref]$length, $null, $null, $null, [ref]$time)) {
-					#create output object
-					$o = '' | Select-Object -Property Key, LastWriteTime, ComputerName
-					$o.ComputerName = "$Computer"
-					$o.Key = $builder.ToString()
-
-					# TODO Change to use the time api
-					$o.LastWriteTime = (Get-Date -Date $time).AddYears(1600).AddHours(-4)
-					$o
-
-					#reinitialize for next time through the loop
-					$length = [int] 1024
-					$builder = (New-Object -TypeName System.Text.StringBuilder -ArgumentList 1024)
-				}
-			}
-			$result = $type3::RegCloseKey($hKey)
-		}
 	}
 }
 
@@ -5433,7 +5140,7 @@ function Get-ReqParams {
 			or an alias, such as "ls".
 
 			.EXAMPLE
-			PS C:\> PS C:\scripts\PowerShell> Get-ReqParams -command 'New-ADUser'
+			PS C:\> Get-ReqParams -command 'New-ADUser'
 
 			-Name <String>
 			Specifies the name of the object. This parameter sets the Name property of the Active Directory object. The LDAP Display
@@ -5462,41 +5169,6 @@ function Get-ReqParams {
 
 	PROCESS {
 		Get-Help -Name $command -Parameter * | Where-Object -FilterScript { $_.required -eq $True }
-	}
-}
-
-function Get-ScriptDirectory {
-	<#
-			.SYNOPSIS
-			Get the Directory of the Script that invokes this function
-
-			.DESCRIPTION
-			Get the Directory of the Script that invokes this function
-
-			.EXAMPLE
-			PS C:\> .\test.ps1
-			C:\scripts\PowerShell
-
-			Description
-			-----------
-			Get the Directory of the Script that invokes this function
-
-			.NOTES
-			Just a quick helper to reduce the script header overhead
-
-			.LINK
-			https://github.com/Alright-IT/AIT.OpenSource
-
-			.LINK
-			https://github.com/Alright-IT/AIT.OpenSource/issues
-	#>
-
-	[OutputType([String])]
-	[CmdletBinding()]
-	param ()
-
-	PROCESS {
-		Split-Path -Path $script:MyInvocation.MyCommand.Path
 	}
 }
 
@@ -5567,53 +5239,6 @@ function Get-ServiceStatus {
 	}
 }
 
-function Get-ServiceStatusInfo {
-	<#
-			.SYNOPSIS
-			This function identifies all services that are configured to auto start
-			with system but are in stopped state
-
-			.DESCRIPTION
-			This function identifies all services that are configured to auto start
-			with system but are in stopped state
-
-			.EXAMPLE
-			PS C:\Windows\system32> Get-ServiceStatusInfo
-
-			Checking System Service status...
-			Total 4 services identified that have startup type configured to Auto start, but are in stopped state.
-			1. Microsoft .NET Framework NGEN v4.0.30319_X86 .
-			2. Microsoft .NET Framework NGEN v4.0.30319_X64 .
-			3. Multimedia Class Scheduler .
-			4. Software Protection .
-
-			Description
-			-----------
-			This function identifies all services that are configured to auto
-			start with system but are in stopped state
-
-			.NOTES
-			Internal Helper
-	#>
-
-	[OutputType([String])]
-	[CmdletBinding()]
-	param ()
-
-	PROCESS {
-		$Services = $(Get-WmiObject -Class win32_service |
-			Where-Object -FilterScript { $_.startmode -eq 'Auto' -and $_.State -eq 'Stopped' } |
-		Select-Object -Property displayname -ExpandProperty displayname)
-		$count = ($Services.count)
-		$ServicesString = (-Message "`r`nChecking-ErrorAction  System-WarningAction  Service-ErrorVariable  status...`r`nTotal-WarningVariable  {0}-OutVariable  services-OutBuffer  identified-PipelineVariable  that have startup type configured to Auto start, but are in stopped state." -f $count)
-		$ServicesString = ($ServicesString + $(1..$count | ForEach-Object -Process { "`r`n $_. $($Services[$($_) - 1]) ." }))
-	}
-
-	END {
-		Write-Output -InputObject $ServicesString
-	}
-}
-
 function Get-ShortDate {
 	<#
 			.SYNOPSIS
@@ -5659,12 +5284,32 @@ function Get-Syntax {
 			command-let that you want to check
 
 			.EXAMPLE
-			PS C:\> Get-syntax Get-syntax
+			PS C:\> Get-Syntax Get-Syntax
+			Get-Syntax [-cmdlet] <Object> [<CommonParameters>]
 
 			Description
 			-----------
-			Get the syntax and parameters for the cmdlet "Get-syntax".
+			Get the syntax and parameters for the cmdlet "Get-Syntax".
 			Makes no sense at all, but this is just an example!
+
+			.EXAMPLE
+			PS C:\> Get-Syntax Get-Help
+
+			Get-Help [[-Name] <string>] [-Path <string>] [-Category <string[]>] [-Component <string[]>] [-Functionality <string[]>] [-Role <string[]>] [-Full] [<CommonParameters>]
+
+			Get-Help [[-Name] <string>] -Detailed [-Path <string>] [-Category <string[]>] [-Component <string[]>] [-Functionality <string[]>] [-Role <string[]>] [<CommonParameters>]
+
+			Get-Help [[-Name] <string>] -Examples [-Path <string>] [-Category <string[]>] [-Component <string[]>] [-Functionality <string[]>] [-Role <string[]>] [<CommonParameters>]
+
+			Get-Help [[-Name] <string>] -Parameter <string> [-Path <string>] [-Category <string[]>] [-Component <string[]>] [-Functionality <string[]>] [-Role <string[]>] [<CommonParameters>]
+
+			Get-Help [[-Name] <string>] -Online [-Path <string>] [-Category <string[]>] [-Component <string[]>] [-Functionality <string[]>] [-Role <string[]>] [<CommonParameters>]
+
+			Get-Help [[-Name] <string>] -ShowWindow [-Path <string>] [-Category <string[]>] [-Component <string[]>] [-Functionality <string[]>] [-Role <string[]>] [<CommonParameters>]
+
+			Description
+			-----------
+			Get the syntax and parameters for the cmdlet "Get-Help".
 
 			.NOTES
 			This is just a little helper function to make the shell more flexible
@@ -5778,7 +5423,7 @@ function Get-TempFile {
 			The default is "tmp"
 
 			.EXAMPLE
-			PS C:\> New-TempFile
+			PS C:\> Get-TempFile
 			C:\Users\josh\AppData\Local\Temp\332ddb9a-5e52-4687-aa01-1d67ab6ae2b1.tmp
 
 			Description
@@ -5786,7 +5431,7 @@ function Get-TempFile {
 			Returns a String of the Temp File with the extension TMP.
 
 			.EXAMPLE
-			PS C:\> New-TempFile -Extension txt
+			PS C:\> Get-TempFile -Extension txt
 			C:\Users\josh\AppData\Local\Temp\332ddb9a-5e52-4687-aa01-1d67ab6ae2b1.txt
 
 			Description
@@ -5794,10 +5439,9 @@ function Get-TempFile {
 			Returns a String of the Temp File with the extension TXT
 
 			.EXAMPLE
-			PS C:\> $foo = (New-TempFile)
+			PS C:\> $foo = (Get-TempFile)
 			PS C:\> New-Item -Path $foo -Force -Confirm:$False
-			PS C:\> Add-Content -Path:$LogPath -Value:"Test" -Encoding UTF8 -Force
-			C:\Users\josh\AppData\Local\Temp\d08cec6f-8697-44db-9fba-2c369963a017.tmp
+			PS C:\> Add-Content -Path $foo -Value 'Test' -Encoding 'UTF8' -Force
 
 			Description
 			-----------
@@ -6114,102 +5758,6 @@ function Get-Uptime {
 	}
 }
 
-function Get-UUID {
-	<#
-			.SYNOPSIS
-			Generates a UUID String
-
-			.DESCRIPTION
-			Generates a UUID String and is a uuidgen.exe replacement
-
-			.EXAMPLE
-			PS C:\> Get-UUID
-			a08cdabe-f598-4930-a537-80e7d9f15dc3
-
-			Description
-			-----------
-			Generates a UUID String
-
-			.NOTES
-			Just a little helper function
-
-			.LINK
-			https://github.com/Alright-IT/AIT.OpenSource
-
-			.LINK
-			https://github.com/Alright-IT/AIT.OpenSource/issues
-	#>
-
-	[OutputType([String])]
-	[CmdletBinding()]
-	param ()
-
-	PROCESS {
-		# Call NET function
-		[guid]::NewGuid().ToString('d')
-	}
-}
-
-function Get-ValidateFileName {
-	<#
-			.SYNOPSIS
-			Validates if the file name has valid characters
-
-			.DESCRIPTION
-			Validates if the file name has valid characters
-
-			.PARAMETER FileName
-			A string containing a file name
-
-			.EXAMPLE
-			PS C:\> Get-ValidateFileName test1.ps1
-			True
-
-			Description
-			-----------
-			Validates if the file name has valid characters
-
-			.EXAMPLE
-			PS C:\> Get-ValidateFileName -Filename 'test1.ps1'
-			True
-
-			Description
-			-----------
-			Validates if the file name has valid characters
-
-			.OUTPUTS
-			System.Boolean
-
-			.NOTES
-			Very easy helper function
-
-			.INPUTS
-			System.String
-	#>
-
-	[OutputType([bool])]
-	param
-	(
-		[Parameter(Mandatory,ValueFromPipeline,
-				Position = 1,
-		HelpMessage = 'A string containing a file name')]
-		[ValidateNotNullOrEmpty()]
-		[String]$Filename
-	)
-
-	PROCESS {
-		$invalidChars = [IO.Path]::GetInvalidFileNameChars()
-
-		foreach ($fileChar in $Filename) {
-			foreach ($invalid in $invalidChars) {
-				if ($fileChar -eq $invalid) {return $False}
-			}
-		}
-
-		return $True
-	}
-}
-
 function Get-ValidateIsIP {
 	<#
 			.SYNOPSIS
@@ -6267,75 +5815,16 @@ function Get-ValidateIsIP {
 
 	PROCESS {
 		try {
-			return ([ipaddress]::Parse($IP))
+			$null = ([ipaddress]::Parse($IP))
+			return $True
 		} catch {
 			Write-Debug -Message 'Something is wrong!!!'
+			return $False
 		}
-
-		return $False
 	}
 }
 
-function Get-ValidatePath {
-	<#
-			.SYNOPSIS
-			Validates if path has valid characters
-
-			.DESCRIPTION
-			Validates if path has valid characters
-
-			.PARAMETER Path
-			A string containing a directory or file path
-
-			.EXAMPLE
-			PS C:\> Get-ValidatePath C:\Users\josh\Documents
-			True
-
-			Description
-			-----------
-			Validates if path has valid characters
-
-			.EXAMPLE
-			PS C:\> Get-ValidatePath -Path "C:\Users\josh\Documents"
-			True
-
-			Description
-			-----------
-			Validates if path has valid characters
-
-			.OUTPUTS
-			System.Boolean
-
-			.NOTES
-			Very easy helper function
-
-			.INPUTS
-			System.String
-	#>
-
-	[OutputType([bool])]
-	param
-	(
-		[Parameter(Mandatory,ValueFromPipeline,
-				Position = 1,
-		HelpMessage = 'A string containing a directory or file path')]
-		[ValidateNotNullOrEmpty()]
-		[String]$Path
-	)
-
-	PROCESS {
-		$invalidChars = [IO.Path]::GetInvalidPathChars()
-
-		foreach ($pathChar in $Path) {
-			foreach ($invalid in $invalidChars) {
-				if ($pathChar -eq $invalid) {return $False}
-			}
-		}
-
-		return $True
-	}
-}
-
+#TODO: CHECK
 function Get-Whois {
 	<#
 			.SYNOPSIS
@@ -6717,10 +6206,10 @@ function Invoke-GnuGrep {
 
 	BEGIN {
 		# Define object
-		Set-Variable -Name path -Value $($PWD)
+		$Path = $PWD
 
 		# need to add filter for files only, no directories
-		Set-Variable -Name files -Value $(Get-ChildItem -Path $Path -Include "$filefilter" -Recurse:$r)
+		$files = (Get-ChildItem -Path $Path -Include "$filefilter" -Recurse:$r)
 	}
 
 	PROCESS {
@@ -6766,7 +6255,7 @@ function Grant-PathFullPermission {
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'Medium',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	param
 	(
 		[Parameter(Mandatory,
@@ -7254,7 +6743,7 @@ function Set-IgnoreSslTrust {
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'High',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	param ()
 
 	BEGIN {
@@ -7316,7 +6805,7 @@ function Set-NotIgnoreSslTrust {
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'Low',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	param ()
 
 	PROCESS {
@@ -7573,6 +7062,7 @@ function Invoke-baloonTip {
 	)
 
 	BEGIN {
+		$null = (Add-Type -AssemblyName System.Drawing)
 		$null = (Add-Type -AssemblyName System.Windows.Forms)
 	}
 
@@ -7639,9 +7129,9 @@ function Invoke-CreateMissingRegistryDrives {
 	}
 
 	PROCESS {
-		$null = New-PSDrive -Name 'HKU' -PSProvider 'Registry' -Root Registry::HKEY_USERS -EA 0
-		$null = New-PSDrive -Name 'HKCR' -PSProvider 'Registry' -Root Registry::HKEY_CLASSES_ROOT -EA 0
-		$null = New-PSDrive -Name 'HKCC' -PSProvider 'Registry' -Root Registry::HKEY_CURRENT_CONFIG -EA 0
+		$null = New-PSDrive -Name 'HKU' -PSProvider 'Registry' -Root Registry::HKEY_USERS
+		$null = New-PSDrive -Name 'HKCR' -PSProvider 'Registry' -Root Registry::HKEY_CLASSES_ROOT
+		$null = New-PSDrive -Name 'HKCC' -PSProvider 'Registry' -Root Registry::HKEY_CURRENT_CONFIG
 	}
 }
 
@@ -8347,7 +7837,7 @@ function Invoke-AppendClassPath {
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'Medium',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	param ()
 
 	PROCESS {
@@ -8396,7 +7886,7 @@ function Invoke-JavaLove {
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'Medium',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	param ()
 
 	BEGIN {
@@ -9674,6 +9164,7 @@ function Find-String
 	}
 }
 
+# TODO: Rename!!!
 function PoSHModuleLoader
 {
 	<#
@@ -9933,7 +9424,7 @@ function Enable-WinRM
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'Medium',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	param ()
 
 	PROCESS {
@@ -10078,7 +9569,7 @@ function Install-PsGet {
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'Medium',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	param ()
 
 	PROCESS {
@@ -10127,7 +9618,7 @@ function Enable-PSGallery {
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'None',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	param ()
 
 	PROCESS {
@@ -10183,7 +9674,7 @@ function Update-AllPsGetModules {
 			Inspired by Homebrew (OS X) command: brew update && brew upgrade
 	#>
 
-	[CmdletBinding(SupportsShouldProcess = $True)]
+	[CmdletBinding(SupportsShouldProcess)]
 	param
 	(
 		[Parameter(Position = 1)]
@@ -10794,7 +10285,7 @@ function Disable-RemoteDesktop {
 
 	[CmdletBinding(DefaultParameterSetName = 'CimSession',
 			ConfirmImpact = 'Medium',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	param
 	(
 		[Parameter(ParameterSetName = 'Main',
@@ -10949,7 +10440,7 @@ function Enable-RemoteDesktop {
 
 	[CmdletBinding(DefaultParameterSetName = 'CimSession',
 			ConfirmImpact = 'Medium',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	param
 	(
 		[Parameter(ParameterSetName = 'Main',
@@ -11299,7 +10790,7 @@ function Remove-TempFiles {
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'High',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	[OutputType([Management.Automation.PSCustomObject])]
 	param
 	(
@@ -11946,8 +11437,8 @@ function Send-Packet {
 
 	PROCESS {
 		$packet = New-Object -TypeName System.Net.Sockets.Socket -ArgumentList (
-			[Net.Sockets.AddressFamily]::InterNetwork,
-			[Net.Sockets.SocketType]::Raw,
+			[Net.Sockets.AddressFamily]::InterNetwork, 
+			[Net.Sockets.SocketType]::Raw, 
 			[Net.Sockets.ProtocolType]::$Protocol
 		)
 
@@ -12251,7 +11742,7 @@ function Set-AcceptProtocolViolation {
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'Medium',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	param ()
 
 	PROCESS {
@@ -12571,7 +12062,7 @@ function Set-FolderDate {
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'Medium',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	param
 	(
 		[Parameter(ValueFromPipeline,
@@ -13060,7 +12551,7 @@ function Invoke-WithElevation {
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'Medium',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	param
 	(
 		[Parameter(Mandatory,
@@ -13643,7 +13134,7 @@ function Set-FileTime {
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'Medium',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	param
 	(
 		[Parameter(Mandatory,
@@ -13986,7 +13477,7 @@ function ConvertFrom-UrlEncoded {
 
 	[CmdletBinding(ConfirmImpact = 'None',
 			HelpUri = 'http://dfch.biz/biz/dfch/PS/System/Utilities/ConvertFrom-UrlEncoded/',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	[OutputType([String])]
 	param
 	(
@@ -14044,7 +13535,7 @@ function ConvertTo-UrlEncoded {
 	#>
 
 	[CmdletBinding(ConfirmImpact = 'None',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	[OutputType([String])]
 	param
 	(
@@ -15025,7 +14516,7 @@ function Get-CertificateExpiration {
 			Check for certificates expiring within year (the default) with a formated list
 	#>
 
-	[CmdletBinding(SupportsShouldProcess = $True)]
+	[CmdletBinding(SupportsShouldProcess)]
 	param
 	(
 		[Parameter(ValueFromPipeline,
@@ -15104,7 +14595,7 @@ function Get-MappedDrives {
 			Get a formated list of users mapped network drives
 	#>
 
-	[CmdletBinding(SupportsShouldProcess = $True)]
+	[CmdletBinding(SupportsShouldProcess)]
 	[OutputType([Management.Automation.PSCustomObject])]
 	param ()
 
@@ -15181,7 +14672,7 @@ function Get-RegistryKeyPropertiesAndValues {
 			http://stackoverflow.com/questions/13350577/can-powershell-get-childproperty-get-a-list-of-real-registry-keys-like-reg-query
 	#>
 
-	[CmdletBinding(SupportsShouldProcess = $True)]
+	[CmdletBinding(SupportsShouldProcess)]
 	param
 	(
 		[Parameter(Mandatory,
@@ -16027,7 +15518,7 @@ function Test-Port {
 
 	[CmdletBinding(DefaultParameterSetName = 'TCP',
 			ConfirmImpact = 'Low',
-	SupportsShouldProcess = $True)]
+	SupportsShouldProcess)]
 	[OutputType([Management.Automation.PSCustomObject])]
 	param
 	(

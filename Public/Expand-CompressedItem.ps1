@@ -69,89 +69,72 @@ if (($PSVersionTable.PSVersion.Major) -lt '5') {
 				It expands archives 'data1.zip' and 'data2.zip' to the current directory.
 
 				.NOTES
-				See module manifest for required software versions and dependencies at:
+				This is just a adopted version of the function find here:
 				http://dfch.biz/biz/dfch/PS/System/Utilities/biz.dfch.PS.System.Utilities.psd1/
 
 				.LINK
 				Online Version: http://dfch.biz/biz/dfch/PS/System/Utilities/Expand-CompressedItem/
 		#>
 
-		[CmdletBinding(ConfirmImpact = 'Low',
-				HelpUri = 'http://dfch.biz/biz/dfch/PS/System/Utilities/Expand-CompressedItem/',
-		SupportsShouldProcess = $True)]
-		param
-		(
-			[Parameter(Mandatory,
-					ValueFromPipeline,
-					Position = 0,
-			HelpMessage = 'Specifies the archive to expand. You can either pass this parameter as a path and name to the archive or as a FileInfo object. You can also pass an array of archives to the parameter. In addition you can pipe a single archive or an array of archives to this parameter as well.')]
-			[ValidateScript({ Test-Path -Path ($_)})]
+		[CmdletBinding()]
+		PARAM (
+			[ValidateScript( {
+						Test-Path -Path ($_)
+			} )]
+			[Parameter(Mandatory,HelpMessage = 'It specifies the archive to expand.', ValueFromPipeline, Position = 0)]
 			[String]$InputObject,
+			[ValidateScript( {
+						Test-Path -Path ($_)
+			} )]
 			[Parameter(Position = 1)]
-			[ValidateScript({ Test-Path -Path ($_)})]
-			[IO.DirectoryInfo]$Path = $PWD.Path,
+			[IO.DirectoryInfo] $Path = $PWD.Path,
 			[ValidateSet('default', 'ZIP')]
-			[String]$Format = 'default'
+			[String] $Format = 'default'
 		)
 
-		BEGIN {
-			# Build a string
-			[String]$fn = ($MyInvocation.MyCommand.Name)
-
+		BEGIN  {
 			# Currently only ZIP is supported
-			switch ($Format) {
+			switch($Format) {
 				'ZIP'
 				{
 					# We use the Shell to extract the ZIP file. If using .NET v4.5 we could have used .NET classes directly more easily.
-					Set-Variable -Name ShellApplication -Value $(New-Object -ComObject Shell.Application)
+					$ShellApplication = (New-Object -ComObject Shell.Application)
 				}
-				default {
+				default
+				{
 					# We use the Shell to extract the ZIP file. If using .NET v4.5 we could have used .NET classes directly more easily.
-					Set-Variable -Name ShellApplication -Value $(New-Object -ComObject Shell.Application)
+					$ShellApplication = (New-Object -ComObject Shell.Application)
 				}
 			}
 
-			# Set the Variable
-			Set-Variable -Name CopyHereOptions -Value $(4 + 1024 + 16)
+			$CopyHereOptions = 4 + 1024 + 16
+
+			# Cleanup
+			$OutputParameter = $null
 		}
 
 		PROCESS {
-			# Define a variable
-			Set-Variable -Name fReturn -Value $($False)
+			foreach($Object in $InputObject) {
+				$Object = (Get-Item -Path $Object)
+				if($PSCmdlet.ShouldProcess( ("Extract '{0}' to '{1}'" -f $Object.Name, $Path.FullName) )) {
+					$CompressedObject = $ShellApplication.NameSpace($Object.FullName)
 
-			# Remove a variable that we do not need anymore
-			Remove-Variable -Name OutputParameter -Force -Confirm:$False -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-
-			# Loop over what we have
-			foreach ($Object in $InputObject) {
-				# Define a new variable
-				Set-Variable -Name $Object -Value $(Get-Item -Path $Object)
-
-				# Check what we have here
-				if ($pscmdlet.ShouldProcess(("Extract '{0}' to '{1}'" -f $Object.Name, $Path.FullName))) {
-					# Set a new variable
-					Set-Variable -Name CompressedObject -Value $($ShellApplication.NameSpace($Object.FullName))
-
-					# Loop over what we have
-					foreach ($item in $CompressedObject.Items()) {
-						if ($pscmdlet.ShouldProcess(("Extract '{0}' to '{1}'" -f $item.Name, $Path.FullName))) {($ShellApplication.Namespace($Path.FullName).CopyHere($item, $CopyHereOptions))}
+					foreach($Item in $CompressedObject.Items()) {
+						if($PSCmdlet.ShouldProcess( ("Extract '{0}' to '{1}'" -f $Item.Name, $Path.FullName) )) {
+							$ShellApplication.Namespace($Path.FullName).CopyHere($Item, $CopyHereOptions)
+						}
 					}
 				}
 			}
 
-			# Show what we have
 			Write-Output -InputObject $OutputParameter
 		}
 
 		END {
 			# Cleanup
-			if ($ShellApplication) {
-				# Remove a no longer needed variable
-				Remove-Variable -Name ShellApplication -Force -Confirm:$False -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+			if($ShellApplication) {
+				$ShellApplication = $null
 			}
-
-			# Set another variable
-			Set-Variable -Name datEnd -Value $([datetime]::Now)
 		}
 	}
 } else {

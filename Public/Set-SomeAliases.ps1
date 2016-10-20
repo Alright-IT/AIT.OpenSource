@@ -65,6 +65,17 @@
 [CmdletBinding()]
 param ()
 
+BEGIN {
+	$SetAliasParams = @{
+		Option        = 'AllScope'
+		Scope         = 'Global'
+		Force         = $True
+		Confirm       = $false
+		ErrorAction   = 'SilentlyContinue'
+		WarningAction = 'SilentlyContinue'
+	}
+}
+
 PROCESS {
 	if (-not (Get-AdminUser)) {
 			Write-Warning -Message 'This function needs Admin rights. Restart in an Elevated PowerShell.'
@@ -72,64 +83,52 @@ PROCESS {
 			break
 	} else {
 		# Set a compatibility Alias
-		(Set-Alias -Name ValidateEmailAddress -Value Approve-MailAddress -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name Validate-Email -Value Approve-MailAddress -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name convert-fromBinHex -Value ConvertFrom-BinHex -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name convert-toBinHex -Value ConvertTo-BinHex -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name IsSmtpMessageAlive -Value Get-TcpPortStatus -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name CheckTcpPort -Value Get-TcpPortStatus -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name Validate-Xml -Value Confirm-XMLisValid -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name To-hex -Value ConvertTo-hex -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name df -Value Get-FreeDiskSpace -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name pause -Value Get-Pause -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name top -Value Get-TopProcesses -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name uptime -Value Get-Uptime -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name uuidgen -Value Get-uuid -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name uuidgen -Value Get-uuid -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name grep -Value Select-String -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name head -Value Invoke-PowerHead -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name Help -Value Invoke-PowerHelp -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name IgnoreSslTrust -Value Set-IgnoreSslTrust -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name NotIgnoreSslTrust -Value Set-NotIgnoreSslTrust -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name NotIgnoreSslTrust -Value Set-NotIgnoreSslTrust -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name run-psgc -Value Invoke-GC -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name run-gc -Value Invoke-GC -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name vi -Value Invoke-VisualEditor -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name vim -Value Invoke-VisualEditor -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name Get-AtomicTime -Value Get-NtpTime -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name append-classpath -Value Invoke-AppendClassPath -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name JavaLove -Value Invoke-JavaLove -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name ll -Value Invoke-PowerLL -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name Load-Pester -Value Reload-PesterModule -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name Load-Test -Value Reload-PesterModule -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name man -Value Invoke-PowerHelp -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name md -Value Invoke-MakeDirectory -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name mkdir -Value Invoke-MakeDirectory -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name ls -Value Get-MyLS -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name myls -Value Get-MyLS -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name pgrep -Value Find-String -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name rdp -Value Invoke-RDPSession -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name AcceptProtocolViolation -Value Set-AcceptProtocolViolation -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name Set-TextEncoding -Value Set-Encoding -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name sudo -Value Invoke-WithElevation -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name time -Value Measure-Command -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name touch -Value Set-FileTime -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name unique -Value Get-Unique -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name uniq -Value Get-Unique -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name ConvertFrom-UnixTime -Value ConvertFrom-UnixDate -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name Send-Command -Value Invoke-Command -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name Explore -Value Invoke-WindowsExplorer -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name tail -Value Invoke-Tail -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name wc -Value Invoke-WordCounter -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name which -Value Invoke-Which -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name whoami -Value Invoke-Whoami -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name Check-IPaddress -Value Invoke-CheckIPaddress -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name Check-SessionArch -Value Invoke-CheckSessionArch -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name Clean-SysInfo -Value Invoke-CleanSysInfo -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name Load-CommandHistory -Value Import-CommandHistory -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name Reload-Module -Value Invoke-ReloadModule -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name Reload-PesterModule -Value Invoke-ReloadPesterModule -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name Test-TCPPort -Value Test-Port -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
-		(Set-Alias -Name Get-TcpPortStatus -Value Test-Port -Option AllScope -Scope Global -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) > $null 2>&1 3>&1
+  		$null = (Set-Alias -Name ValidateEmailAddress -Value Approve-MailAddress  @SetAliasParams)
+  		$null = (Set-Alias -Name Validate-Email -Value Approve-MailAddress  @SetAliasParams)
+  		$null = (Set-Alias -Name convert-fromBinHex -Value ConvertFrom-BinHex  @SetAliasParams)
+  		$null = (Set-Alias -Name convert-toBinHex -Value ConvertTo-BinHex  @SetAliasParams)
+  		$null = (Set-Alias -Name IsSmtpMessageAlive -Value Get-TcpPortStatus  @SetAliasParams)
+  		$null = (Set-Alias -Name CheckTcpPort -Value Get-TcpPortStatus  @SetAliasParams)
+  		$null = (Set-Alias -Name Validate-Xml -Value Confirm-XMLisValid  @SetAliasParams)
+  		$null = (Set-Alias -Name To-hex -Value ConvertTo-hex  @SetAliasParams)
+  		$null = (Set-Alias -Name df -Value Get-FreeDiskSpace  @SetAliasParams)
+  		$null = (Set-Alias -Name pause -Value Get-Pause  @SetAliasParams)
+  		$null = (Set-Alias -Name top -Value Get-TopProcesses  @SetAliasParams)
+  		$null = (Set-Alias -Name uptime -Value Get-Uptime  @SetAliasParams)
+  		$null = (Set-Alias -Name grep -Value Select-String  @SetAliasParams)
+  		$null = (Set-Alias -Name head -Value Invoke-PowerHead  @SetAliasParams)
+  		$null = (Set-Alias -Name Help -Value Invoke-PowerHelp  @SetAliasParams)
+  		$null = (Set-Alias -Name vi -Value Invoke-VisualEditor  @SetAliasParams)
+  		$null = (Set-Alias -Name vim -Value Invoke-VisualEditor  @SetAliasParams)
+  		$null = (Set-Alias -Name Get-AtomicTime -Value Get-NtpTime  @SetAliasParams)
+  		$null = (Set-Alias -Name append-classpath -Value Invoke-AppendClassPath  @SetAliasParams)
+  		$null = (Set-Alias -Name JavaLove -Value Invoke-JavaLove  @SetAliasParams)
+  		$null = (Set-Alias -Name ll -Value Invoke-PowerLL  @SetAliasParams)
+  		$null = (Set-Alias -Name Load-Pester -Value Reload-PesterModule  @SetAliasParams)
+  		$null = (Set-Alias -Name man -Value Invoke-PowerHelp  @SetAliasParams)
+  		$null = (Set-Alias -Name md -Value Invoke-MakeDirectory  @SetAliasParams)
+  		$null = (Set-Alias -Name mkdir -Value Invoke-MakeDirectory  @SetAliasParams)
+  		$null = (Set-Alias -Name ls -Value Get-MyLS  @SetAliasParams)
+  		$null = (Set-Alias -Name myls -Value Get-MyLS  @SetAliasParams)
+  		$null = (Set-Alias -Name pgrep -Value Find-String  @SetAliasParams)
+  		$null = (Set-Alias -Name rdp -Value Invoke-RDPSession  @SetAliasParams)
+  		$null = (Set-Alias -Name AcceptProtocolViolation -Value Set-AcceptProtocolViolation  @SetAliasParams)
+  		$null = (Set-Alias -Name Set-TextEncoding -Value Set-Encoding  @SetAliasParams)
+  		$null = (Set-Alias -Name sudo -Value Invoke-WithElevation  @SetAliasParams)
+  		$null = (Set-Alias -Name time -Value Measure-Command  @SetAliasParams)
+  		$null = (Set-Alias -Name touch -Value Set-FileTime  @SetAliasParams)
+  		$null = (Set-Alias -Name unique -Value Get-Unique  @SetAliasParams)
+  		$null = (Set-Alias -Name uniq -Value Get-Unique  @SetAliasParams)
+  		$null = (Set-Alias -Name ConvertFrom-UnixTime -Value ConvertFrom-UnixDate  @SetAliasParams)
+  		$null = (Set-Alias -Name Send-Command -Value Invoke-Command  @SetAliasParams)
+  		$null = (Set-Alias -Name Explore -Value Invoke-WindowsExplorer  @SetAliasParams)
+  		$null = (Set-Alias -Name tail -Value Invoke-Tail  @SetAliasParams)
+  		$null = (Set-Alias -Name wc -Value Invoke-WordCounter  @SetAliasParams)
+  		$null = (Set-Alias -Name which -Value Invoke-Which  @SetAliasParams)
+  		$null = (Set-Alias -Name whoami -Value Invoke-Whoami  @SetAliasParams)
+  		$null = (Set-Alias -Name Check-IPaddress -Value Invoke-CheckIPaddress  @SetAliasParams)
+  		$null = (Set-Alias -Name Check-SessionArch -Value Invoke-CheckSessionArch  @SetAliasParams)
+  		$null = (Set-Alias -Name Clean-SysInfo -Value Invoke-CleanSysInfo  @SetAliasParams)
+  		$null = (Set-Alias -Name Load-CommandHistory -Value Import-CommandHistory  @SetAliasParams)
 	}
 }

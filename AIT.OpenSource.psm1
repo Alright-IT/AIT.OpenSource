@@ -2859,6 +2859,14 @@ function Get-ExternalIP {
 	)
 
 	BEGIN {
+		<#
+			Related to #AAT-22
+
+			Todo: Remove then #AAT-23 is closed
+		#>
+		Write-Error -Message 'Remote Host is down!!!' -ErrorAction Stop
+		break
+
 		# URL to ask
 		$site = 'http://tools.bewoelkt.net/ip.php'
 	}

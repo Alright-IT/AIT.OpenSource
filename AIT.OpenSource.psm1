@@ -21,6 +21,8 @@
 #region License
 
 <#
+		TODO: Open Issue - Documented in AAT-4
+
 		Copyright (c) 2016, Alright-IT GmbH
 		All rights reserved.
 

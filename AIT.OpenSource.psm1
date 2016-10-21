@@ -24,6 +24,8 @@
 		TODO: Open Issue - Documented in AAT-4
 
 		Copyright (c) 2016, Alright-IT GmbH
+		Copyright (c) 2015, Quality Software Ltd
+		Copyright (c) 2006-2015, Joerg Hochwald
 		All rights reserved.
 
 		Redistribution and use in source and binary forms, with or without

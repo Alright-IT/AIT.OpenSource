@@ -86,11 +86,11 @@
 			# Tags applied to this module. These help with module discovery in online galleries.
 			Tags = @('PowerShell','ToolsTools')
 			# A URL to the license for this module.
-			LicenseUri = 'https://raw.githubusercontent.com/Alright-IT/AIT.OpenSource/master/docs/LICENSE'
+			LicenseUri = 'https://license.aitlab.de/oss/license.txt'
 			# A URL to the main website for this project.
 			ProjectUri = 'https://github.com/Alright-IT/AIT.OpenSource'
 			# A URL to an icon representing this module.
-			IconUri = 'http://www.alright-it.com/media/AIT_logo-1.jpg'
+			IconUri = 'https://images.aitlab.de/static/ait_logo.png'
 			# ReleaseNotes of this module
 			ReleaseNotes = 'See changelog.md in docs directory'
 			# External dependent modules of this module

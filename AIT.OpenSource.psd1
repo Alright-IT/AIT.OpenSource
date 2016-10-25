@@ -3,7 +3,7 @@
 	RootModule = 'AIT.OpenSource.psm1'
 
 	# Version number of this module.
-	ModuleVersion = '1.0.0.0'
+	ModuleVersion = '1.0.0.5'
 
 	# ID used to uniquely identify this module
 	GUID = '3a74cdbe-0255-4878-83ee-2e9d69772740'
@@ -86,11 +86,11 @@
 			# Tags applied to this module. These help with module discovery in online galleries.
 			Tags = @('PowerShell','ToolsTools')
 			# A URL to the license for this module.
-			LicenseUri = 'http://www.net-experts.net/licenses/license.html'
+			LicenseUri = 'https://license.aitlab.de/oss/license.txt'
 			# A URL to the main website for this project.
-			ProjectUri = 'http://support.net-experts.net'
+			ProjectUri = 'https://github.com/Alright-IT/AIT.OpenSource'
 			# A URL to an icon representing this module.
-			IconUri = 'https://www.net-experts.net/images/NETXscadist.png'
+			IconUri = 'https://images.aitlab.de/static/ait_logo.png'
 			# ReleaseNotes of this module
 			ReleaseNotes = 'See changelog.md in docs directory'
 			# External dependent modules of this module

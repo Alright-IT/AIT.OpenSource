@@ -1,9 +1,7 @@
-# enabling TECHNOLOGY Open Source PowerShell Module
+# Alright-IT Open Source PowerShell Module
 
 ## Build Status
-Current Build Status (nearly in real time)
-[![](http://build.net-experts.net/app/rest/builds/buildType:(id:EnaTEC_EnatecOpenSource_Build)/statusIcon)](#)
-
+Following soon.
 ## Changelog Information
 There is no standard change log format!
 

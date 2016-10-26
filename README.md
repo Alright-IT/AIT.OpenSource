@@ -1,8 +1,11 @@
 # Alright-IT Open Source PowerShell Module
 
+This PowerShell Module contains a collection of Tool, functions and snippets.
+
+Mostly developed, or adopted for internal use. However, we found that these were so useful that we decided to publish them.
+
 <!-- MarkdownTOC depth=3 autolink=true autoanchor=true bracket=round -->
 
-- [General](#general)
 - [Build Status](#build-status)
 - [Version format](#version-format)
 	- [Version labels](#version-labels)
@@ -25,14 +28,6 @@
 - [Additional Information](#additional-information)
 
 <!-- /MarkdownTOC -->
-
-<a name="general"></a>
-## General
-This PowerShell Module contains a collection of Tool, functions and snippets.
-
-Mostly developed, or adopted for internal use. However, we found that these were so useful that we decided to publish them.
-
-
 
 <a name="build-status"></a>
 ## Build Status

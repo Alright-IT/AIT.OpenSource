@@ -38,7 +38,7 @@ Mostly developed, or adopted for internal use. However, we found that these were
 ## Build Status
 Current Build Status (nearly in real time) from our build server.
 
-![The Build Status is not available][http://build.net-experts.net/app/rest/builds/buildType:(id:AIT_OpenSource_Build)/statusIcon]
+![The Build Status is not available](http://build.net-experts.net/app/rest/builds/buildType:(id:AIT_OpenSource_Build)/statusIcon)
 
 <a name="version-format"></a>
 ## Version format

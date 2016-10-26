@@ -40,7 +40,7 @@ Current Build Status (nearly in real time) from our build server.
 ## Version format
 We use a semantic version system that matches the Microsoft versioning policy for PowerShell.
 
-Given a version number MAJOR.MINOR.PATCH.BUILD, increment the:
+Given a version number **MAJOR**.**MINOR**.**PATCH**.**BUILD**, increment the:
 
 * **MAJOR** version major changes or functions that might be incompatible with several older versions of PowerShell or the target system (If applicable)
 * **MINOR** version add functionality in a fully backward compatible manner

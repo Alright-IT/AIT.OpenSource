@@ -3,16 +3,19 @@
 
 <#
 		.SYNOPSIS
-		Alright-IT PowerShell Open Source Tools, Functions and useful snippets
+		This PowerShell Module contains a collection of Tool, functions and snippets.
 
 		.DESCRIPTION
-		Alright-IT PowerShell Open Source Tools, Functions and useful snippets
+		This PowerShell Module contains a collection of Tool, functions and snippets.
+
+		Mostly developed, or adopted for internal use. However, we found that these were so useful that we decided to publish them.
 
 		.NOTES
 		Public Beta Version
 
 		.LINK
 		http://www.alright-it.com
+		http://www.aitlab.de
 		https://github.com/Alright-IT/AIT.OpenSource
 
 		.LINK
@@ -62,7 +65,7 @@
 
 		The Software is not supported by Microsoft Corp (MSFT)!
 
-		More about Alright-IT GmbH http://www.alright-it.com
+		More about Alright-IT GmbH http://www.alright-it.com & http://www.aitlab.de
 #>
 
 #endregion License

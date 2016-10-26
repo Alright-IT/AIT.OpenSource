@@ -1,4 +1,6 @@
-﻿#requires -Version 2.0
+﻿#!/usr/bin/env powershell
+
+#requires -Version 3.0
 
 #region Info
 <#
@@ -78,6 +80,7 @@
 		http://www.aitlab.de
 #>
 
+[CmdletBinding()]
 param ()
 
 function global:Get-IsWin10 {
@@ -135,7 +138,7 @@ if ($IsNewModuleAvailable) {
 
 	$null = (Import-Module -Name 'AIT.OpenSource' -Force -DisableNameChecking -NoClobber -Global)
 } else {
-	Write-Warning "Unable to find the Alright-IT Open Source PowerShell Module. Makes absolute no sense to continue!!!"
+	Write-Warning -Message 'Unable to find the Alright-IT Open Source PowerShell Module. Makes absolute no sense to continue!!!'
 
 	break
 }
@@ -305,13 +308,15 @@ if ($host.Name -eq 'ConsoleHost') {
 }
 
 # Set the Defaults
-Set-DefaultPrompt
+if (Get-Command -Name Set-DefaultPrompt -ErrorAction SilentlyContinue) {
+	Set-DefaultPrompt
+}
 
 # Where the windows Starts
 Set-Location -Path $BasePath
 
 # Display some infos
-function info {
+function Get-ProfileInfo {
 	PROCESS {
 		''
 		('Today is: ' + $((Get-Date -Format 'yyyy-MM-dd') + ' ' + (Get-Date -Format 'HH:mm:ss')))
@@ -326,7 +331,7 @@ function info {
 }
 
 # The Message of the Day (MOTD) function
-function motd {
+function Get-ProfileMOTD {
 	PROCESS {
 		# Display Disk Informations
 		# We try to display regular Disk only, no fancy disk drives
@@ -405,13 +410,15 @@ if ($host.Name -eq 'ConsoleHost') {
 	}
 
 	# Show infos
-	if (Get-Command -Name info -ErrorAction SilentlyContinue) { info }
+	if (Get-Command -Name Get-ProfileInfo -ErrorAction SilentlyContinue) {
+		Get-ProfileInfo
+	}
 
 	# Show message of the day
-	if (Get-Command -Name motd -ErrorAction SilentlyContinue) {
+	if (Get-Command -Name Get-ProfileMOTD -ErrorAction SilentlyContinue) {
 		# This is the function from above.
 		# If you want, you might use Get-MOTD here.
-		motd
+		Get-ProfileMOTD
 	}
 } elseif (($host.Name -eq 'Windows PowerShell ISE Host') -and ($psISE)) {
 	# Yeah, we run within the ISE
@@ -443,14 +450,16 @@ if ($host.Name -eq 'ConsoleHost') {
 	}
 
 	# Support for Remote was added a while ago.
-	if (Get-Command -Name Get-MOTD -ErrorAction SilentlyContinue) { Get-MOTD }
+	if (Get-Command -Name Get-MOTD -ErrorAction SilentlyContinue) {
+		Get-MOTD
+	}
 
 	# Use this to display the Disk Info
-	if (Get-Command -Name motd -ErrorAction SilentlyContinue) {
+	if (Get-Command -Name Get-ProfileMOTD -ErrorAction SilentlyContinue) {
 		# Blank Line
 		Write-Output -InputObject ''
 
-		motd
+		Get-ProfileMOTD
 	}
 } else {
 	# Not in the Console, not ISE... Where to hell are we right now?

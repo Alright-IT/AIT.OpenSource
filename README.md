@@ -16,6 +16,7 @@
 - [Changelog format](#changelog-format)
 	- [Date format](#date-format)
 	- [Changes](#changes)
+	- [References](#references)
 - [License](#license)
 	- [License Terms](#license-terms)
 	- [Agreement](#agreement)
@@ -47,7 +48,7 @@ Given a version number MAJOR.MINOR.PATCH.BUILD, increment the:
 
 * **MAJOR** version major changes or functions that might be incompatible with several older versions of PowerShell or the target system (If applicable)
 * **MINOR** version add functionality in a fully backward compatible manner
-* **PATCH** version mostly bug fixes, optimisations, or refactoring
+* **PATCH** version mostly bug fixes, optimizations, or refactoring
 * **BUILD** the build number. This number is increased automatically by our (automated) Build processes
 
 <a name="version-labels"></a>
@@ -60,30 +61,37 @@ This is mostly used for pre-Releases, Beta builds, or EAP (Early Access Program)
 * **`Beta`** marks Beta Releases
 * **`EAP`** marks EAP (Early Access Program) Releases
 
+<a name="remarks"></a>
 #### Remarks
 Pre-Releases, Beta builds, or EAP (Early Access Program) Releases are not fully tested and might be unstable! You should not use them in a production environment.
 
-It is ==highly recommended== to use them on a dedicated test system. However, due to the nature of PowerShell Modules, a fallback should be easy.
+It is ==highly recommended== to use them on a dedicated test system. However, due to the nature of PowerShell Modules, a fall-back should be easy.
 
 <a name="general-repository-information"></a>
 ## General Repository Information
 The branching structure follows the GIT-flow concept, defined by [Vincent Driessen](http://nvie.com/posts/a-successful-git-branching-model/)
 
+<a name="master-branch"></a>
 #### Master branch
 The main branch where the source code of HEAD always reflects a production-ready state.
 
+<a name="develop-branch"></a>
 #### Develop branch
 Consider this to be the main branch where the source code of HEAD always reflects a state with the latest delivered development changes for the next release. Some would call this the "*integration branch*".
 
+<a name="feature-branches"></a>
 #### Feature branches
 These are used to develop new features for the upcoming or a distant future release. The essence of a feature branch is that it exists as long as the feature is in development, but will eventually be merged back into develop (to definitely add the new feature to the upcoming release) or discarded (in case of a disappointing experiment).
 
+<a name="release-branches"></a>
 #### Release branches
 These branches support preparation of a new production release. By using this the develop branch is cleared to receive features for the next big release.
 
+<a name="hotfix-branches"></a>
 #### Hotfix branches
 Hotfix branches are very much like release branches in that they are also meant to prepare for a new production release, albeit unplanned.
 
+<a name="git-flow"></a>
 #### GIT-flow
 We use GIT-flow functions whenever possible to build patches, fixes or releases! That increases the number of branches, but it makes the tracking much easier and it is easier for us.
 
@@ -105,7 +113,7 @@ We highly appreciate any kind of feedback. We really do. So please help us to im
 
 Due to the nature of PowerShell, there is another great way: Pull the source, fix it and contribute the source back to us (via a Pull Request).
 
-Please use the [GitHub](https://github.com/Alright-IT/AIT.OpenSource/issues) Issue-Tracker for this project.
+Please use the [GitHub Issue-Tracker](https://github.com/Alright-IT/AIT.OpenSource/issues) for this project.
 
 <a name="reporting-security-issues"></a>
 ### Reporting security issues
@@ -117,7 +125,7 @@ Security reports are extremely appreciated, and we will name the source! Even so
 
 <a name="feature-requests--changes"></a>
 ## Feature Requests / Changes
-Any kind of changes and/or Requests and/or Bug Reports has to be addressed via the [GitLab Issue system](http://gitlab.com/sca-posh/development/issues). For a guide to submitting good bug reports, please read [Painless Bug Tracking](http://www.joelonsoftware.com/articles/fog0000000029.html).
+Any kind of changes and/or Requests and/or Bug Reports has to be addressed via the [GitHub Issue-Tracker](https://github.com/Alright-IT/AIT.OpenSource/issues). For a guide to submitting good bug reports, please read [Painless Bug Tracking](http://www.joelonsoftware.com/articles/fog0000000029.html).
 
 Please note that feature requests should be in a human understandable form of a agile user story.
 
@@ -146,7 +154,7 @@ Whenever it is possible to track the source or idea or find out where it comes f
 <a name="changelog-format"></a>
 ## Changelog format
 See **`CHANGELOG.md`**
-You will finde a detailed [Changelog](CHANGELOG.md) as part of the distribution.
+You will find a detailed [Changelog](CHANGELOG.md) as part of the distribution.
 
 For our Changelog, we follow these principles:
 
@@ -175,16 +183,24 @@ Sometimes we also use the following:
 * **`Interim`** for workarounds and things with a short lifecycle
 * **`Testing`** for features that have a early beta character and might not make it to a final release.
 
+<a name="references"></a>
+### References
+Whenever possible, we will reference the [GitHub Issue-Tracker](https://github.com/Alright-IT/AIT.OpenSource/issues).
+Sometimes you will find references like **`[AAT-1]`**, this is a link to our internal Jira instance. We will not open another issue on the [GitHub Issue-Tracker](https://github.com/Alright-IT/AIT.OpenSource/issues).
+
+<a name="unreleased"></a>
 #### Unreleased
 We use **`[Unreleased]`** to show what we are working on for the next release.
 
 This is an informal tag. Mostly because this is not finally tested or documented.
 
+<a name="yanked-releases"></a>
 #### Yanked Releases
 Yanked releases are versions that had to be pulled because of a serious bug or even security issue.
 
 We mark yanked Releases with **`[YANKED]`**
 
+<a name="chore"></a>
 #### Chore
 A chore is a story or Release with no direct customer value, but simply needs to be done. This is often used if we change the documentation, change the structure of things or do architectural changes. This is a typical scrum/agile term.
 
@@ -193,7 +209,8 @@ We mark such releases with **`[Chore]`**
 <a name="license"></a>
 ## License
 We include a dedicated [License](LICENSE.md) with each distribution.
-This is the BSD 3-Clause license.
+
+This is the **BSD-3-Clause** license.
 
 <a name="license-terms"></a>
 ### License Terms
@@ -220,6 +237,7 @@ By using the Software, you agree to the License, Terms and Conditions above!
 ### Warranty
 We provide this software =="AS IS"==! There are ==no warranties== in any kind. No kidding, none means none!
 
+<a name="in-plain-english"></a>
 #### In plain english
 You can use our software, you can change it and distribute it. Both for yourself, as hobby and even commercial. Do not steal! So please let our copyright notice and do not remove or change it.
 

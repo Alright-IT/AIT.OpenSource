@@ -9,8 +9,7 @@ Mostly developed, or adopted for internal use. However, we found that these were
 - [Build Status](#build-status)
 - [Version format](#version-format)
 	- [Version labels](#version-labels)
-- [General Repository Information](#general-repository-information)
-	- [Fork and contribute?](#fork-and-contribute)
+- [Fork and contribute?](#fork-and-contribute)
 - [Trademarks](#trademarks)
 - [Issues](#issues)
 	- [Reporting security issues](#reporting-security-issues)
@@ -31,6 +30,7 @@ Mostly developed, or adopted for internal use. However, we found that these were
 
 <a name="build-status"></a>
 ## Build Status
+
 Current Build Status (nearly in real time) from our build server.
 
 [![The Build Status is not available](http://build.net-experts.net/app/rest/builds/buildType:(id:AIT_OpenSource_Build)/statusIcon)](#)
@@ -38,6 +38,7 @@ Current Build Status (nearly in real time) from our build server.
 
 <a name="version-format"></a>
 ## Version format
+
 We use a semantic version system that matches the Microsoft versioning policy for PowerShell.
 
 Given a version number **MAJOR**.**MINOR**.**PATCH**.**BUILD**, increment the:
@@ -49,6 +50,7 @@ Given a version number **MAJOR**.**MINOR**.**PATCH**.**BUILD**, increment the:
 
 <a name="version-labels"></a>
 ### Version labels
+
 Sometimes we add labels to as extension to the MAJOR.MINOR.PATCH.BUILD format.
 
 This is mostly used for pre-Releases, Beta builds, or EAP (Early Access Program) Releases.
@@ -59,50 +61,28 @@ This is mostly used for pre-Releases, Beta builds, or EAP (Early Access Program)
 
 <a name="remarks"></a>
 #### Remarks
+
 Pre-Releases, Beta builds, or EAP (Early Access Program) Releases are not fully tested and might be unstable! You should not use them in a production environment.
 
 It is ==highly recommended== to use them on a dedicated test system. However, due to the nature of PowerShell Modules, a fall-back should be easy.
 
 <a name="general-repository-information"></a>
-## General Repository Information
-The branching structure follows the GIT-flow concept, defined by [Vincent Driessen](http://nvie.com/posts/a-successful-git-branching-model/)
-
-<a name="master-branch"></a>
-#### Master branch
-The main branch where the source code of HEAD always reflects a production-ready state.
-
-<a name="develop-branch"></a>
-#### Develop branch
-Consider this to be the main branch where the source code of HEAD always reflects a state with the latest delivered development changes for the next release. Some would call this the "*integration branch*".
-
-<a name="feature-branches"></a>
-#### Feature branches
-These are used to develop new features for the upcoming or a distant future release. The essence of a feature branch is that it exists as long as the feature is in development, but will eventually be merged back into develop (to definitely add the new feature to the upcoming release) or discarded (in case of a disappointing experiment).
-
-<a name="release-branches"></a>
-#### Release branches
-These branches support preparation of a new production release. By using this the develop branch is cleared to receive features for the next big release.
-
-<a name="hotfix-branches"></a>
-#### Hotfix branches
-Hotfix branches are very much like release branches in that they are also meant to prepare for a new production release, albeit unplanned.
-
-<a name="git-flow"></a>
-#### GIT-flow
-We use GIT-flow functions whenever possible to build patches, fixes or releases! That increases the number of branches, but it makes the tracking much easier and it is easier for us.
 
 <a name="fork-and-contribute"></a>
-### Fork and contribute?
+## Fork and contribute?
+
 You are welcome to contribute to this project.
 
 Please read the [contribution guidelines](CONTRIBUTING.md).
 
 <a name="trademarks"></a>
 ## Trademarks
+
 Many (or nearly all) names of products and companies mentioned here are registered trademarks or trademarks of others.
 
 <a name="issues"></a>
 ## Issues
+
 Please report any issues that you find.
 
 We highly appreciate any kind of feedback. We really do. So please help us to improve things and make better software ;-)
@@ -113,6 +93,7 @@ Please use the [GitHub Issue-Tracker](https://github.com/Alright-IT/AIT.OpenSour
 
 <a name="reporting-security-issues"></a>
 ### Reporting security issues
+
 We take security seriously. If you discover any security issues, report them right away!
 
 Please _DO NOT_ report them via a public issue, instead use the private [Support portal](http://support.aitlab.de) to open a Ticket!
@@ -121,6 +102,7 @@ Security reports are extremely appreciated, and we will name the source! Even so
 
 <a name="feature-requests--changes"></a>
 ## Feature Requests / Changes
+
 Any kind of changes and/or Requests and/or Bug Reports has to be addressed via the [GitHub Issue-Tracker](https://github.com/Alright-IT/AIT.OpenSource/issues). For a guide to submitting good bug reports, please read [Painless Bug Tracking](http://www.joelonsoftware.com/articles/fog0000000029.html).
 
 Please note that feature requests should be in a human understandable form of a agile user story.
@@ -139,6 +121,7 @@ Please keep the following fact in mind: Only we, [Alright-IT GmbH](http://www.al
 
 <a name="reservation-of-rights"></a>
 ## Reservation of Rights
+
 Many parts, functions or source code fragments are based on the intellectual work, scripts or sources of others. Even if the source might not be a copy or direct clone, the function or even the idea might be inspired by the work of others.
 
 **We deeply respect and acknowledge the intellectual work of others!**
@@ -149,6 +132,7 @@ Whenever it is possible to track the source or idea or find out where it comes f
 
 <a name="changelog-format"></a>
 ## Changelog format
+
 See **`CHANGELOG.md`**
 You will find a detailed [Changelog](CHANGELOG.md) as part of the distribution.
 
@@ -156,6 +140,7 @@ For our Changelog, we follow these principles:
 
 <a name="date-format"></a>
 ### Date format
+
 We strictly use the following format: **`YYY-MM-DD`**
 
 For example, `September 27, 2012` is represented as `2012-09-27`.
@@ -164,6 +149,7 @@ This format is also known as ISO 8601.
 
 <a name="changes"></a>
 ### Changes
+
 We group changes an describe there impact as follows:
 
 * **`Added`** for new features or functionality
@@ -181,35 +167,41 @@ Sometimes we also use the following:
 
 <a name="references"></a>
 ### References
+
 Whenever possible, we will reference the [GitHub Issue-Tracker](https://github.com/Alright-IT/AIT.OpenSource/issues).
 Sometimes you will find references like **`[AAT-1]`**, this is a link to our internal Jira instance. We will not open another issue on the [GitHub Issue-Tracker](https://github.com/Alright-IT/AIT.OpenSource/issues).
 
 <a name="unreleased"></a>
 #### Unreleased
+
 We use **`[Unreleased]`** to show what we are working on for the next release.
 
 This is an informal tag. Mostly because this is not finally tested or documented.
 
 <a name="yanked-releases"></a>
 #### Yanked Releases
+
 Yanked releases are versions that had to be pulled because of a serious bug or even security issue.
 
 We mark yanked Releases with **`[YANKED]`**
 
 <a name="chore"></a>
 #### Chore
+
 A chore is a story or Release with no direct customer value, but simply needs to be done. This is often used if we change the documentation, change the structure of things or do architectural changes. This is a typical scrum/agile term.
 
 We mark such releases with **`[Chore]`**
 
 <a name="license"></a>
 ## License
+
 We include a dedicated [License](LICENSE.md) with each distribution.
 
 This is the **BSD-3-Clause** license.
 
 <a name="license-terms"></a>
 ### License Terms
+
 Copyright (c) 2016, Alright-IT GmbH
 Copyright (c) 2015, Quality Software Ltd
 Copyright (c) 2006-2015, Joerg Hochwald
@@ -227,14 +219,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 <a name="agreement"></a>
 ### Agreement
+
 By using the Software, you agree to the License, Terms and Conditions above!
 
 <a name="warranty"></a>
 ### Warranty
+
 We provide this software =="AS IS"==! There are ==no warranties== in any kind. No kidding, none means none!
 
 <a name="in-plain-english"></a>
 #### In plain english
+
 You can use our software, you can change it and distribute it. Both for yourself, as hobby and even commercial. Do not steal! So please let our copyright notice and do not remove or change it.
 
 So not use us, our names, or the name of our software for any marketing or advertising! Rename it and use your own name.
@@ -246,10 +241,12 @@ This is not negotiable! If you are unwilling to accept these easy terms, you sho
 
 <a name="data-privacy"></a>
 ## Data privacy
+
 We try a avoid any kind of Call Home! Even if some functions might use a dedicated AIT (Alright-IT) system or backend services. Please see the [AITLAB Site](https://www.aitlab.de) for more information.
 
 <a name="additional-information"></a>
 ## Additional Information
+
 Please view the Header information each each file, it might contain other Licensing and/or Copyright information(s). As an Example, the PowerShell Base Module is licensed under other terms and has another Copyright informations.
 
 *Please Review each File/Directory for Licensing and/or Copyright information(s).*

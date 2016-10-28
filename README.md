@@ -71,7 +71,7 @@ It is ==highly recommended== to use them on a dedicated test system. However, du
 <a name="fork-and-contribute"></a>
 ## Fork and contribute?
 
-You are welcome to contribute to this project.
+We love PowerShell, and we love to share knowledge, you are more then welcome to contribute to this project.
 
 Please read the [contribution guidelines](CONTRIBUTING.md).
 

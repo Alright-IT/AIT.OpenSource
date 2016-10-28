@@ -2,7 +2,7 @@
 
 This is a guide for everyone interested in contributing to our open source projects. It's based on well known community workflows.
 
-You are encouraged to fork our open source repositories and make adjustments according to your own preferences. If you really want to contribute, you should consider a Pull request.
+We love PowerShell, and we love to share knowledge, you are encouraged to fork our open source repositories and make adjustments according to your own preferences. If you really want to contribute, you should consider a Pull request, this will help us to improve and to share this improvement with the community.
 
 <!-- MarkdownTOC depth=3 autolink=true autoanchor=true bracket=round -->
 
